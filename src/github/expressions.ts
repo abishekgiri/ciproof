@@ -452,3 +452,85 @@ class TruthVisitor implements ExprVisitor<Truth> {
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Phase 3 helper: extract literal ref/branch comparisons for witness seeding
+// ---------------------------------------------------------------------------
+
+/** Branch/ref literals compared against `github.ref` / `base_ref` / `head_ref`. */
+export interface RefLiterals {
+  ref: string[];
+  baseRef: string[];
+  headRef: string[];
+}
+
+/**
+ * Extract string literals that a condition compares against `github.ref`,
+ * `github.base_ref`, or `github.head_ref`. AST-based (no regex), so it only
+ * reports literals it can identify with certainty; anything else is ignored.
+ * These seed branch witnesses for exploration.
+ */
+export function extractRefLiterals(raw: string): RefLiterals {
+  const result: RefLiterals = { ref: [], baseRef: [], headRef: [] };
+  let ast: Expr;
+  try {
+    const { tokens } = new Lexer(raw).lex();
+    ast = new Parser(tokens, NAMED_CONTEXTS, FUNCTIONS).parse();
+  } catch {
+    return result;
+  }
+  ast.accept(new RefLiteralCollector(result));
+  return result;
+}
+
+class RefLiteralCollector implements ExprVisitor<void> {
+  constructor(private readonly out: RefLiterals) {}
+
+  visitBinary(node: Binary): void {
+    const type = node.operator.type;
+    if (type === TokenType.EQUAL_EQUAL || type === TokenType.BANG_EQUAL) {
+      this.collect(node.left, node.right);
+      this.collect(node.right, node.left);
+    }
+    node.left.accept(this);
+    node.right.accept(this);
+  }
+  visitLogical(node: Logical): void {
+    for (const arg of node.args) {
+      arg.accept(this);
+    }
+  }
+  visitUnary(node: Unary): void {
+    node.expr.accept(this);
+  }
+  visitGrouping(node: Grouping): void {
+    node.group.accept(this);
+  }
+  visitFunctionCall(node: FunctionCall): void {
+    for (const arg of node.args) {
+      arg.accept(this);
+    }
+  }
+  visitLiteral(): void {}
+  visitContextAccess(): void {}
+  visitIndexAccess(): void {}
+
+  private collect(pathNode: Expr, literalNode: Expr): void {
+    const path = pathNode.accept(pathVisitor);
+    const literal = literalNode.accept(stringKeyVisitor);
+    if (path === null || literal === null || path.root !== "github") {
+      return;
+    }
+    if (path.segments.length !== 1) {
+      return;
+    }
+    const field = path.segments[0];
+    if (field === "ref") {
+      this.out.ref.push(literal);
+    } else if (field === "base_ref") {
+      this.out.baseRef.push(literal);
+    } else if (field === "head_ref") {
+      this.out.headRef.push(literal);
+    }
+  }
+}

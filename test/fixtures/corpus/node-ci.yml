@@ -1,0 +1,23 @@
+# Representative sample (not scraped): a common Node CI shape — lint -> test ->
+# build chain on push to main and on pull requests. Used only for exploration
+# smoke testing; never executed.
+name: node-ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo lint
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

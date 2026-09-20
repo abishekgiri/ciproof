@@ -1,0 +1,23 @@
+# Purpose: the canonical Phase 2/3 spike, triggered by pull_request and
+# workflow_dispatch. Exploration must discover the skip_tests true/false plans
+# plus the pull_request behavior, without any of them being hard-coded.
+name: canonical-spike
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        type: boolean
+        default: false
+jobs:
+  test:
+    if: ${{ !inputs.skip_tests }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test
+  deploy:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy
