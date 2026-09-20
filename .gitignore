@@ -31,3 +31,6 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 *.swp
+
+# Local agent guidance — private, never publish
+CLAUDE.md
