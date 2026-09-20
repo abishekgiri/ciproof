@@ -6,7 +6,11 @@
  * `ExplorationLimits`. It never generates an impossible combination silently.
  */
 
-import { validateScenario, type Scenario } from "./scenario.js";
+import {
+  validateScenario,
+  type Scenario,
+  type WorkflowRunContext,
+} from "./scenario.js";
 import type { EventDomain } from "./domains.js";
 import type { ExplorationLimits } from "./limits.js";
 
@@ -100,6 +104,47 @@ function* scenariosForDomain(domain: EventDomain): Generator<Scenario> {
             }
           }
         }
+      }
+      return;
+    case "schedule":
+      for (const branch of domain.branches) {
+        for (const cron of domain.schedules) {
+          yield {
+            event: "schedule",
+            branch,
+            ref: `refs/heads/${branch}`,
+            fork: false,
+            actorClass: "internal",
+            changedFiles: [],
+            inputs: {},
+            schedule: cron,
+          };
+        }
+      }
+      return;
+    case "workflow_run":
+      for (const run of domain.workflowRuns) {
+        yield {
+          event: "workflow_run",
+          branch: run.branch,
+          ref: `refs/heads/${run.branch}`,
+          fork: false,
+          actorClass: "internal",
+          changedFiles: [],
+          inputs: {},
+          workflowRun: {
+            workflowName: run.workflowName,
+            activity: run.activity,
+            branch: run.branch,
+            ...(run.conclusion !== undefined
+              ? {
+                  conclusion: run.conclusion as NonNullable<
+                    WorkflowRunContext["conclusion"]
+                  >,
+                }
+              : {}),
+          },
+        };
       }
       return;
   }

@@ -153,11 +153,15 @@ describe("normalizeWorkflow", () => {
     expect(m.jobs.get("build")?.permissions.mode).toBe("unspecified");
   });
 
-  it("V. keeps an unsupported schedule trigger visible", async () => {
+  it("V. normalizes a schedule trigger (now supported)", async () => {
     const m = await model("unsupported/schedule.yml");
-    expect(m.triggers).toHaveLength(0);
+    const schedule = m.triggers.find((t) => t.event === "schedule");
+    expect(schedule).toBeDefined();
+    if (schedule?.event === "schedule") {
+      expect(schedule.schedules[0]?.cron).toBe("0 0 * * *");
+    }
     expect(m.unsupported.some((u) => u.kind === "unsupported-trigger")).toBe(
-      true,
+      false,
     );
   });
 
@@ -170,13 +174,13 @@ describe("normalizeWorkflow", () => {
     ).toBe(true);
   });
 
-  it("marks matrix strategy and dynamic outputs as unsupported", async () => {
+  it("models a static matrix (supported) and marks dynamic outputs unsupported", async () => {
     const matrix = await model("unsupported/matrix-complex.yml");
-    expect(
-      matrix.jobs
-        .get("build")
-        ?.unsupported.some((u) => u.kind === "matrix-strategy"),
-    ).toBe(true);
+    const build = matrix.jobs.get("build");
+    expect(build?.matrix?.kind).toBe("static");
+    expect(build?.unsupported.some((u) => u.kind === "matrix-strategy")).toBe(
+      false,
+    );
 
     const dynamic = await model("unsupported/dynamic-output.yml");
     expect(

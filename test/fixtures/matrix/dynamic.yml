@@ -1,0 +1,19 @@
+# Purpose: dynamic matrix (values from a runtime output) remains unsupported.
+name: matrix-dynamic
+on: push
+jobs:
+  gen:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.x.outputs.v }}
+    steps:
+      - id: x
+        run: echo "v=[1,2]" >> "$GITHUB_OUTPUT"
+  build:
+    needs: gen
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.gen.outputs.versions) }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

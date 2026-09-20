@@ -12,6 +12,7 @@ import type {
   BranchPathFilters,
   TriggerModel,
   WorkflowModel,
+  WorkflowRunTrigger,
 } from "../model/index.js";
 import { andTruth, type Truth } from "../model/truth.js";
 import { evidence, type Evidence, type TriggerMatch } from "./evidence.js";
@@ -53,6 +54,25 @@ export function evaluateTrigger(
     };
   }
 
+  if (trigger.event === "schedule") {
+    // schedule is time-based and runs on the default branch; if declared, it
+    // fires. CIProof does not model when.
+    return {
+      match: "matched",
+      evidence: [
+        evidence(
+          "pass",
+          "schedule matches (runs on the default branch; timing not modeled)",
+          trigger.source,
+        ),
+      ],
+    };
+  }
+
+  if (trigger.event === "workflow_run") {
+    return evaluateWorkflowRun(trigger, scenario);
+  }
+
   const ev: Evidence[] = [
     evidence("pass", `event ${scenario.event} matched`, trigger.source),
   ];
@@ -66,6 +86,58 @@ export function evaluateTrigger(
   );
 
   const combined = andTruth([branchResult, pathResult]);
+  return { match: truthToMatch(combined), evidence: ev };
+}
+
+function evaluateWorkflowRun(
+  trigger: WorkflowRunTrigger,
+  scenario: Scenario,
+): TriggerEvaluation {
+  const run = scenario.workflowRun;
+  if (!run) {
+    return {
+      match: "unknown",
+      evidence: [
+        evidence("unknown", "no upstream workflow_run context supplied"),
+      ],
+    };
+  }
+  const ev: Evidence[] = [];
+
+  const nameMatches =
+    trigger.workflows.length === 0 ||
+    trigger.workflows.includes(run.workflowName);
+  ev.push(
+    evidence(
+      nameMatches ? "pass" : "fail",
+      `upstream workflow "${run.workflowName}" ${nameMatches ? "matches" : "does not match"} [${trigger.workflows.join(", ")}]`,
+    ),
+  );
+
+  const activityMatches = trigger.types.includes(run.activity);
+  ev.push(
+    evidence(
+      activityMatches ? "pass" : "fail",
+      `activity "${run.activity}" ${activityMatches ? "is" : "is not"} in [${trigger.types.join(", ")}]`,
+    ),
+  );
+
+  const branchTruth = matchBranchFilters(
+    {
+      ...(trigger.branches ? { branches: trigger.branches } : {}),
+      ...(trigger.branchesIgnore
+        ? { branchesIgnore: trigger.branchesIgnore }
+        : {}),
+    },
+    run.branch,
+    ev,
+  );
+
+  const combined = andTruth([
+    nameMatches ? "true" : "false",
+    activityMatches ? "true" : "false",
+    branchTruth,
+  ]);
   return { match: truthToMatch(combined), evidence: ev };
 }
 

@@ -1,0 +1,11 @@
+# Purpose: workflow_run with types omitted -> GitHub applies all documented
+# activity types (requested, in_progress, completed).
+name: workflow-run-no-types
+on:
+  workflow_run:
+    workflows: [CI]
+jobs:
+  react:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo react

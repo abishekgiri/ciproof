@@ -7,6 +7,7 @@
  */
 
 import type { ConditionModel } from "./condition.js";
+import type { MatrixModel } from "./matrix.js";
 import type { PermissionModel } from "./permissions.js";
 import type { SourceLocation } from "./source.js";
 import type { UnsupportedConstruct } from "./workflow.js";
@@ -27,6 +28,8 @@ export interface JobModel {
    */
   condition?: ConditionModel;
   permissions: PermissionModel;
+  /** Strategy matrix, when declared (static = modeled; dynamic = unsupported). */
+  matrix?: MatrixModel;
   /** Environment name, when declared as a simple string. */
   environment?: string;
   source?: SourceLocation;

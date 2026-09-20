@@ -30,7 +30,20 @@ export type {
   WorkflowDispatchTrigger,
   DispatchInputModel,
   DispatchInputType,
+  ScheduleTrigger,
+  ScheduleEntry,
+  WorkflowRunTrigger,
+  WorkflowRunActivity,
 } from "./trigger.js";
+export type {
+  MatrixModel,
+  StaticMatrixModel,
+  DynamicMatrixModel,
+  MatrixCombination,
+  MatrixValue,
+} from "./matrix.js";
+export { MAX_MATRIX_JOBS } from "./matrix.js";
+export { expandMatrix } from "./matrix-expand.js";
 export type { JobModel, JobKind } from "./job.js";
 export type { WorkflowModel, UnsupportedConstruct } from "./workflow.js";
 export { getDependencies, getDependents, validateNeeds } from "./needs.js";

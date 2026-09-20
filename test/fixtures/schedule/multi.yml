@@ -1,0 +1,17 @@
+# Purpose: multiple schedule entries; a job gated on github.event.schedule runs
+# only for the matching cron. Exercises schedule normalization + event.schedule.
+name: schedule-multi
+on:
+  schedule:
+    - cron: "0 0 * * *"
+    - cron: "0 12 * * *"
+jobs:
+  nightly:
+    if: ${{ github.event.schedule == '0 0 * * *' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo nightly
+  always-run:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo always
