@@ -1,0 +1,19 @@
+# Purpose: regression for a false CP001. A release job is reachable only via a
+# tag push (push.tags), which CIProof does not model. The tag filter must make
+# the workflow partial so `release` is UNKNOWN, never a false "unreachable".
+name: tag-gated
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
+  release:
+    needs: build
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo release

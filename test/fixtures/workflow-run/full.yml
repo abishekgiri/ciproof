@@ -1,0 +1,14 @@
+# Purpose: workflow_run with multiple upstream names, a branch filter, and a
+# conclusion-gated job. Exercises name/activity/branch matching + conclusion.
+name: workflow-run-full
+on:
+  workflow_run:
+    workflows: [Build, Test]
+    types: [completed]
+    branches: [main]
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

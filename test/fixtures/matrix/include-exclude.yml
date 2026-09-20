@@ -1,0 +1,22 @@
+# Purpose: static matrix with exclude (partial match) and include (augment +
+# new combination). Golden values mirror GitHub's documented example shape.
+name: matrix-include-exclude
+on: push
+jobs:
+  build:
+    strategy:
+      matrix:
+        fruit: [apple, pear]
+        animal: [cat, dog]
+        include:
+          - color: green
+          - color: pink
+            animal: cat
+          - fruit: apple
+            shape: circle
+          - fruit: banana
+          - fruit: banana
+            animal: cat
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

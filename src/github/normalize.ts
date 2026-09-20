@@ -15,6 +15,9 @@ import {
   NoOperationTraceWriter,
   isMapping,
   isString,
+  isNumber,
+  isBoolean,
+  isSequence,
   isBasicExpression,
 } from "@actions/workflow-parser";
 import type {
@@ -32,17 +35,23 @@ import type {
 import {
   ModelDiagnosticCode,
   UNSPECIFIED_PERMISSIONS,
+  MAX_MATRIX_JOBS,
+  expandMatrix,
   validateNeeds,
   type ConditionModel,
   type DispatchInputModel,
   type DispatchInputType,
   type JobModel,
+  type MatrixModel,
+  type MatrixValue,
   type ModelDiagnostic,
   type PermissionLevel,
   type PermissionModel,
+  type ScheduleEntry,
   type TriggerModel,
   type UnsupportedConstruct,
   type WorkflowModel,
+  type WorkflowRunActivity,
 } from "../model/index.js";
 import type { BranchPathFilters } from "../model/trigger.js";
 import type { SourceLocation } from "../model/source.js";
@@ -177,11 +186,23 @@ function buildTriggers(
     const source = eventSource(file, onToken, event);
 
     if (event === "push") {
+      const pushConfig = template.events.push;
       triggers.push({
         event: "push",
-        filters: filtersOf(template.events.push),
+        filters: filtersOf(pushConfig),
         ...withSource(source),
       });
+      // Tag filters affect which refs trigger the run, and CIProof does not
+      // model tag refs. Record a limitation so reachability stays honest
+      // (otherwise a tag-gated job looks unreachable).
+      if (pushConfig?.tags || pushConfig?.["tags-ignore"]) {
+        unsupported.push({
+          kind: "tag-filter",
+          message:
+            "push tag filters (tags/tags-ignore) are not modeled by CIProof v0.1",
+          ...withSource(source),
+        });
+      }
     } else if (event === "pull_request") {
       triggers.push({
         event: "pull_request",
@@ -198,6 +219,18 @@ function buildTriggers(
       triggers.push({
         event: "workflow_dispatch",
         inputs: buildInputs(template.events.workflow_dispatch),
+        ...withSource(source),
+      });
+    } else if (event === "schedule") {
+      triggers.push({
+        event: "schedule",
+        schedules: buildSchedules(template.events.schedule),
+        ...withSource(source),
+      });
+    } else if (event === "workflow_run") {
+      triggers.push({
+        event: "workflow_run",
+        ...buildWorkflowRun(template.events.workflow_run),
         ...withSource(source),
       });
     } else {
@@ -232,6 +265,56 @@ function filtersOf(
     filters.pathsIgnore = [...config["paths-ignore"]];
   }
   return filters;
+}
+
+const WORKFLOW_RUN_ACTIVITIES = [
+  "requested",
+  "in_progress",
+  "completed",
+] as const;
+
+function buildSchedules(
+  config: WorkflowTemplate["events"]["schedule"],
+): ScheduleEntry[] {
+  const schedules: ScheduleEntry[] = [];
+  for (const entry of config ?? []) {
+    const schedule: ScheduleEntry = { cron: entry.cron };
+    if (entry.timezone !== undefined) {
+      schedule.timezone = entry.timezone;
+    }
+    schedules.push(schedule);
+  }
+  return schedules;
+}
+
+function buildWorkflowRun(config: WorkflowTemplate["events"]["workflow_run"]): {
+  workflows: string[];
+  types: WorkflowRunActivity[];
+  branches?: string[];
+  branchesIgnore?: string[];
+} {
+  const declaredTypes = (config?.types ?? []).filter(
+    (t): t is WorkflowRunActivity =>
+      (WORKFLOW_RUN_ACTIVITIES as readonly string[]).includes(t),
+  );
+  const result: {
+    workflows: string[];
+    types: WorkflowRunActivity[];
+    branches?: string[];
+    branchesIgnore?: string[];
+  } = {
+    workflows: [...(config?.workflows ?? [])],
+    // When `types` is omitted, GitHub applies all documented activity types.
+    types:
+      declaredTypes.length > 0 ? declaredTypes : [...WORKFLOW_RUN_ACTIVITIES],
+  };
+  if (config?.branches) {
+    result.branches = [...config.branches];
+  }
+  if (config?.["branches-ignore"]) {
+    result.branchesIgnore = [...config["branches-ignore"]];
+  }
+  return result;
 }
 
 function buildInputs(
@@ -338,11 +421,22 @@ function buildJob(
       });
     }
 
-    if (job.strategy) {
-      unsupported.push({
-        kind: "matrix-strategy",
-        message: `matrix strategy in job "${job.id.value}" is not modeled by CIProof v0.1`,
-      });
+    if (rawJob) {
+      const matrix = buildMatrix(rawJob);
+      if (matrix) {
+        model.matrix = matrix;
+        if (matrix.kind === "dynamic") {
+          unsupported.push({
+            kind: "matrix-strategy",
+            message: `dynamic matrix in job "${job.id.value}" is not modeled by CIProof v0.1`,
+          });
+        } else if (matrix.combinations.length > MAX_MATRIX_JOBS) {
+          unsupported.push({
+            kind: "matrix-size",
+            message: `matrix in job "${job.id.value}" exceeds GitHub's ${MAX_MATRIX_JOBS}-job limit`,
+          });
+        }
+      }
     }
     if (job.outputs) {
       unsupported.push({
@@ -358,6 +452,112 @@ function buildJob(
   }
 
   return model;
+}
+
+/**
+ * Parse a job's `strategy.matrix` into a MatrixModel. Static matrices (all
+ * literal values) are fully modeled; anything expression-driven (`fromJSON`,
+ * `needs` outputs, …) is marked dynamic and stays unsupported.
+ */
+function buildMatrix(rawJob: MappingToken): MatrixModel | undefined {
+  const strategy = findKey(rawJob, "strategy");
+  if (!strategy || !isMapping(strategy)) {
+    return undefined;
+  }
+  const matrixToken = findKey(strategy, "matrix");
+  if (!matrixToken) {
+    return undefined; // strategy without a matrix (e.g. only fail-fast)
+  }
+  if (isBasicExpression(matrixToken) || !isMapping(matrixToken)) {
+    return { kind: "dynamic", reason: "matrix is an expression" };
+  }
+
+  const dimensions: Record<string, MatrixValue[]> = {};
+  const include: Record<string, MatrixValue>[] = [];
+  const exclude: Record<string, MatrixValue>[] = [];
+
+  for (const pair of matrixToken) {
+    const key = pair.key.toString();
+    if (key === "include" || key === "exclude") {
+      const entries = readMatrixEntries(pair.value);
+      if (entries === null) {
+        return { kind: "dynamic", reason: `${key} contains an expression` };
+      }
+      (key === "include" ? include : exclude).push(...entries);
+    } else {
+      const values = readMatrixValues(pair.value);
+      if (values === null) {
+        return {
+          kind: "dynamic",
+          reason: `dimension "${key}" contains an expression`,
+        };
+      }
+      dimensions[key] = values;
+    }
+  }
+
+  return {
+    kind: "static",
+    dimensions,
+    include,
+    exclude,
+    combinations: expandMatrix(dimensions, include, exclude),
+  };
+}
+
+/** Read a matrix dimension's literal values, or null if not all literal. */
+function readMatrixValues(token: TemplateToken): MatrixValue[] | null {
+  if (!isSequence(token)) {
+    return null;
+  }
+  const values: MatrixValue[] = [];
+  for (const element of token) {
+    const literal = readScalar(element);
+    if (literal === null) {
+      return null; // object-valued or expression element -> not static
+    }
+    values.push(literal);
+  }
+  return values;
+}
+
+/** Read include/exclude entries (list of literal objects), or null if dynamic. */
+function readMatrixEntries(
+  token: TemplateToken,
+): Record<string, MatrixValue>[] | null {
+  if (!isSequence(token)) {
+    return null;
+  }
+  const entries: Record<string, MatrixValue>[] = [];
+  for (const element of token) {
+    if (!isMapping(element)) {
+      return null;
+    }
+    const entry: Record<string, MatrixValue> = {};
+    for (const pair of element) {
+      const literal = readScalar(pair.value);
+      if (literal === null) {
+        return null;
+      }
+      entry[pair.key.toString()] = literal;
+    }
+    entries.push(entry);
+  }
+  return entries;
+}
+
+/** Read a literal scalar (string/number/boolean), or null otherwise. */
+function readScalar(token: TemplateToken): MatrixValue | null {
+  if (isString(token)) {
+    return token.value;
+  }
+  if (isNumber(token)) {
+    return token.value;
+  }
+  if (isBoolean(token)) {
+    return token.value;
+  }
+  return null;
 }
 
 /**

@@ -22,20 +22,42 @@ set of scenarios, evaluates each, and collapses them into distinct execution
 plans (`ciproof paths`). Neither checks invariants or searches for
 counterexamples — that is Phase 4+.
 
-| Construct                                                             | Parse | Normalize                    | Evaluate-one                             | Explore-many                                  |
-| --------------------------------------------------------------------- | ----- | ---------------------------- | ---------------------------------------- | --------------------------------------------- |
-| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                          | yes (event-specific context)             | yes (only declared events generated)          |
-| `branches` / `branches-ignore`                                        | yes   | yes (patterns + order)       | yes (filter-pattern globbing)            | yes (verified witnesses + a non-match class)  |
-| `paths` / `paths-ignore`                                              | yes   | yes (patterns + order)       | yes over explicit changed files          | yes (matching / non-matching / mixed / empty) |
-| `workflow_dispatch` `boolean`                                         | yes   | yes                          | yes (booleans stay booleans)             | yes (enumerates `false`, `true`)              |
-| `workflow_dispatch` `choice`                                          | yes   | yes                          | yes                                      | yes (enumerates declared options)             |
-| `workflow_dispatch` `string` / `number` / `environment`               | yes   | represented (unsupported)    | UNKNOWN when it affects a result         | partial (left unset; limitation recorded)     |
-| `jobs.<id>.if`                                                        | yes   | yes                          | yes (three-valued; implicit `success()`) | yes                                           |
-| `success()` / `always()`                                              | yes   | n/a                          | yes (from modeled needs state)           | yes                                           |
-| `failure()` / `cancelled()`                                           | yes   | n/a                          | UNKNOWN (runtime state not modeled)      | UNKNOWN plan preserved; partial               |
-| `needs` (string or list) + DAG                                        | yes   | yes (diagnostics)            | yes (success/skipped abstraction)        | yes                                           |
-| `permissions`                                                         | yes   | yes (explicit / unspecified) | not yet (no effective-token computation) | not yet                                       |
-| `schedule` / `workflow_run` / matrix / reusable / dynamic outputs     | yes   | unsupported marker           | UNKNOWN when relevant                    | not generated; limitation → partial           |
+| Construct                                                             | Parse | Normalize                                     | Evaluate-one                                    | Explore-many                                  |
+| --------------------------------------------------------------------- | ----- | --------------------------------------------- | ----------------------------------------------- | --------------------------------------------- |
+| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                                           | yes (event-specific context)                    | yes (only declared events generated)          |
+| `branches` / `branches-ignore`                                        | yes   | yes (patterns + order)                        | yes (filter-pattern globbing)                   | yes (verified witnesses + a non-match class)  |
+| `paths` / `paths-ignore`                                              | yes   | yes (patterns + order)                        | yes over explicit changed files                 | yes (matching / non-matching / mixed / empty) |
+| `workflow_dispatch` `boolean`                                         | yes   | yes                                           | yes (booleans stay booleans)                    | yes (enumerates `false`, `true`)              |
+| `workflow_dispatch` `choice`                                          | yes   | yes                                           | yes                                             | yes (enumerates declared options)             |
+| `workflow_dispatch` `string` / `number` / `environment`               | yes   | represented (unsupported)                     | UNKNOWN when it affects a result                | partial (left unset; limitation recorded)     |
+| `jobs.<id>.if`                                                        | yes   | yes                                           | yes (three-valued; implicit `success()`)        | yes                                           |
+| `success()` / `always()`                                              | yes   | n/a                                           | yes (from modeled needs state)                  | yes                                           |
+| `failure()` / `cancelled()`                                           | yes   | n/a                                           | UNKNOWN (runtime state not modeled)             | UNKNOWN plan preserved; partial               |
+| `needs` (string or list) + DAG                                        | yes   | yes (diagnostics)                             | yes (success/skipped abstraction)               | yes                                           |
+| `permissions`                                                         | yes   | yes (explicit / unspecified)                  | not yet (no effective-token computation)        | not yet                                       |
+| `schedule`                                                            | yes   | yes (cron entries)                            | yes (default-branch ctx; github.event.schedule) | yes (one scenario per declared cron)          |
+| `workflow_run`                                                        | yes   | yes (names/types/branches)                    | yes (name/activity/branch; conclusion)          | yes (name × activity × branch × conclusion)   |
+| static matrix (literal values)                                        | yes   | yes (dimensions/include/exclude/combinations) | supported at job level (see abstraction)        | yes (no per-instance explosion)               |
+| dynamic matrix (`fromJSON` / needs output)                            | yes   | unsupported (dynamic)                         | UNKNOWN when relevant                           | limitation → partial                          |
+| `push` tag filters (`tags` / `tags-ignore`)                           | yes   | limitation (tag refs unmodeled)               | UNKNOWN when relevant                           | limitation → partial                          |
+| reusable workflows / dynamic outputs / `concurrency`                  | yes   | unsupported marker                            | UNKNOWN when relevant                           | not generated; limitation → partial           |
+
+### Matrix abstraction
+
+GitHub evaluates `jobs.<id>.if` **before** matrix expansion, and CIProof's
+checks operate at job level, so a static matrix does not change job reachability.
+CIProof therefore parses and resolves static matrix combinations (for
+representation and `include`/`exclude` correctness) but does **not** expand them
+into separate scenarios — avoiding state-space explosion. `matrix.*` is not made
+available to `jobs.<id>.if` (matching GitHub), so a condition referencing it is
+UNKNOWN.
+
+### workflow_run trust caveat
+
+`workflow_run` runs are privileged (secrets, write token) regardless of the
+upstream run's privilege. CIProof does **not** model cross-workflow trust
+provenance, so it does **not** turn `workflow_run` into a CP003 violation; such
+paths remain UNKNOWN pending provenance modeling.
 
 ### Phase 3 exploration assumptions
 

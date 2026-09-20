@@ -1,0 +1,11 @@
+# Purpose: workflow_run requested activity (no conclusion available).
+name: workflow-run-requested
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [requested]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo notify

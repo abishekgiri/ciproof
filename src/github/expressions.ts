@@ -155,6 +155,19 @@ export interface ExpressionGithubContext {
   ref: string;
   base_ref: string;
   head_ref: string;
+  /** Modeled `github.event.*` payload fields (schedule, workflow_run). */
+  event?: ExpressionEventPayload;
+}
+
+export interface ExpressionEventPayload {
+  /** github.event.schedule (the declared cron that fired). */
+  schedule?: string;
+  /** github.event.workflow_run.* */
+  workflow_run?: {
+    conclusion?: string;
+    name?: string;
+    head_branch?: string;
+  };
 }
 
 /** Concrete evaluation context. All values are CIProof-owned primitives. */
@@ -180,6 +193,26 @@ const MODELED_GITHUB_FIELDS = new Set([
   "base_ref",
   "head_ref",
 ]);
+
+/** Dotted `github.event.*` paths that are modeled for the given context. */
+function modeledEventPaths(ctx: ExpressionContext): Set<string> {
+  const paths = new Set<string>();
+  const payload = ctx.github.event;
+  if (!payload) {
+    return paths;
+  }
+  if (payload.schedule !== undefined) {
+    paths.add("event.schedule");
+  }
+  if (payload.workflow_run) {
+    for (const key of ["conclusion", "name", "head_branch"] as const) {
+      if (payload.workflow_run[key] !== undefined) {
+        paths.add(`event.workflow_run.${key}`);
+      }
+    }
+  }
+  return paths;
+}
 
 const UNMODELED_FUNCTIONS = new Set(["failure", "cancelled", "hashfiles"]);
 const WELL_KNOWN_NAMES = new Set(
@@ -216,7 +249,11 @@ export function evaluateExpression(
   const unknownInputs = new Set(ctx.unknownInputs);
   const successKnown = ctx.successValue !== "unknown";
 
-  const modeled = new ModelabilityVisitor(unknownInputs, successKnown);
+  const modeled = new ModelabilityVisitor(
+    unknownInputs,
+    successKnown,
+    modeledEventPaths(ctx),
+  );
   const evaluator = new TruthVisitor(modeled, context, functions);
 
   try {
@@ -233,6 +270,25 @@ function buildContextDictionary(ctx: ExpressionContext): Dictionary {
     { key: "base_ref", value: new StringData(ctx.github.base_ref) },
     { key: "head_ref", value: new StringData(ctx.github.head_ref) },
   );
+
+  const payload = ctx.github.event;
+  if (payload) {
+    const event = new Dictionary();
+    if (payload.schedule !== undefined) {
+      event.add("schedule", new StringData(payload.schedule));
+    }
+    if (payload.workflow_run) {
+      const run = new Dictionary();
+      for (const key of ["conclusion", "name", "head_branch"] as const) {
+        const value = payload.workflow_run[key];
+        if (value !== undefined) {
+          run.add(key, new StringData(value));
+        }
+      }
+      event.add("workflow_run", run);
+    }
+    github.add("event", event);
+  }
 
   const inputs = new Dictionary();
   for (const [name, value] of Object.entries(ctx.inputs)) {
@@ -338,6 +394,7 @@ class ModelabilityVisitor implements ExprVisitor<boolean> {
   constructor(
     private readonly unknownInputs: Set<string>,
     private readonly successKnown: boolean,
+    private readonly modeledEventPaths: Set<string>,
   ) {}
 
   visitLiteral(): boolean {
@@ -382,10 +439,14 @@ class ModelabilityVisitor implements ExprVisitor<boolean> {
 
   private pathModeled(path: ResolvedPath): boolean {
     if (path.root === "github") {
-      return (
+      if (
         path.segments.length === 1 &&
         MODELED_GITHUB_FIELDS.has(path.segments[0] as string)
-      );
+      ) {
+        return true;
+      }
+      // Nested modeled payload paths, e.g. github.event.schedule.
+      return this.modeledEventPaths.has(path.segments.join("."));
     }
     if (path.root === "inputs") {
       return (

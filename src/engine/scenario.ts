@@ -27,6 +27,27 @@ export interface Scenario {
   changedFiles: string[];
   /** workflow_dispatch inputs supplied for this run. */
   inputs: Record<string, boolean | string>;
+  /** The declared cron that triggered a `schedule` run (github.event.schedule). */
+  schedule?: string;
+  /** The triggering upstream run, for `workflow_run` scenarios. */
+  workflowRun?: WorkflowRunContext;
+}
+
+export interface WorkflowRunContext {
+  workflowName: string;
+  activity: "requested" | "in_progress" | "completed";
+  /** Branch of the triggering (upstream) run. */
+  branch: string;
+  /** Present only for the `completed` activity. */
+  conclusion?:
+    | "success"
+    | "failure"
+    | "cancelled"
+    | "skipped"
+    | "neutral"
+    | "timed_out"
+    | "action_required"
+    | "stale";
 }
 
 /**
@@ -41,7 +62,13 @@ export function validateScenario(scenario: Scenario): EvaluationDiagnostic[] {
     scenario.event === "pull_request" ||
     scenario.event === "pull_request_target";
 
-  if (scenario.event === "push" || scenario.event === "workflow_dispatch") {
+  const isDefaultBranchEvent =
+    scenario.event === "push" ||
+    scenario.event === "workflow_dispatch" ||
+    scenario.event === "schedule" ||
+    scenario.event === "workflow_run";
+
+  if (isDefaultBranchEvent) {
     if (scenario.fork) {
       diagnostics.push({
         code: "CIPROOF_SCENARIO_INCONSISTENT",

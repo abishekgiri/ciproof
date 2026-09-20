@@ -12,7 +12,12 @@
 import type { SourceLocation } from "./source.js";
 
 export type SupportedTriggerEvent =
-  "push" | "pull_request" | "pull_request_target" | "workflow_dispatch";
+  | "push"
+  | "pull_request"
+  | "pull_request_target"
+  | "workflow_dispatch"
+  | "schedule"
+  | "workflow_run";
 
 /** Branch/path filters shared by push and pull-request-family events. */
 export interface BranchPathFilters {
@@ -63,8 +68,39 @@ export interface WorkflowDispatchTrigger {
   source?: SourceLocation;
 }
 
+/** A single `schedule` cron entry. */
+export interface ScheduleEntry {
+  cron: string;
+  /** Declared timezone, when present (GitHub supports it on some plans). */
+  timezone?: string;
+}
+
+export interface ScheduleTrigger {
+  event: "schedule";
+  /** Declared cron entries, in order. */
+  schedules: ScheduleEntry[];
+  source?: SourceLocation;
+}
+
+/** `workflow_run` activity types. */
+export type WorkflowRunActivity = "requested" | "in_progress" | "completed";
+
+export interface WorkflowRunTrigger {
+  event: "workflow_run";
+  /** Upstream workflow names (OR semantics). */
+  workflows: string[];
+  /** Activity types (defaults to all documented types when omitted). */
+  types: WorkflowRunActivity[];
+  /** Branch filters, matched against the triggering (upstream) run's branch. */
+  branches?: string[];
+  branchesIgnore?: string[];
+  source?: SourceLocation;
+}
+
 export type TriggerModel =
   | PushTrigger
   | PullRequestTrigger
   | PullRequestTargetTrigger
-  | WorkflowDispatchTrigger;
+  | WorkflowDispatchTrigger
+  | ScheduleTrigger
+  | WorkflowRunTrigger;

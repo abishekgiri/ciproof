@@ -13,6 +13,7 @@ import type {
   DispatchInputModel,
   SupportedTriggerEvent,
   WorkflowModel,
+  WorkflowRunTrigger,
 } from "../model/index.js";
 import { extractRefLiterals } from "../github/expressions.js";
 import { isGlob, synthesizeNonMatch, synthesizeWitness } from "./witnesses.js";
@@ -40,6 +41,17 @@ export interface EventDomain {
   fileSets: string[][];
   /** Full assignments over supported dispatch inputs. */
   inputCombos: Record<string, boolean | string>[];
+  /** Declared cron strings (schedule event). */
+  schedules: string[];
+  /** Upstream-run candidates (workflow_run event). */
+  workflowRuns: WorkflowRunCandidate[];
+}
+
+export interface WorkflowRunCandidate {
+  workflowName: string;
+  activity: "requested" | "in_progress" | "completed";
+  branch: string;
+  conclusion?: string;
 }
 
 export interface DomainBuild {
@@ -48,6 +60,8 @@ export interface DomainBuild {
 }
 
 const HEAD_GENERIC = "ciproof-head";
+const WORKFLOW_RUN_BRANCH = "ciproof-upstream";
+const REPRESENTATIVE_CONCLUSIONS = ["success", "failure"];
 
 /** Build the per-event scenario domains for a workflow. */
 export function buildDomains(model: WorkflowModel): DomainBuild {
@@ -69,7 +83,12 @@ export function buildDomains(model: WorkflowModel): DomainBuild {
 
   const domains: EventDomain[] = [];
 
+  const referencesConclusion = [...model.jobs.values()].some((job) =>
+    job.condition?.raw.includes("workflow_run.conclusion"),
+  );
+
   for (const trigger of model.triggers) {
+    const emptyExtras = { schedules: [], workflowRuns: [] };
     if (trigger.event === "workflow_dispatch") {
       domains.push({
         event: "workflow_dispatch",
@@ -84,11 +103,9 @@ export function buildDomains(model: WorkflowModel): DomainBuild {
         forks: [{ fork: false, actorClass: "internal" }],
         fileSets: [[]],
         inputCombos: inputCombos(trigger.inputs, limitations),
+        ...emptyExtras,
       });
-      continue;
-    }
-
-    if (trigger.event === "push") {
+    } else if (trigger.event === "push") {
       domains.push({
         event: "push",
         branches: branchCandidates(
@@ -102,31 +119,91 @@ export function buildDomains(model: WorkflowModel): DomainBuild {
         forks: [{ fork: false, actorClass: "internal" }],
         fileSets: fileCandidates(trigger.filters, limitations),
         inputCombos: [{}],
+        ...emptyExtras,
       });
-      continue;
+    } else if (
+      trigger.event === "pull_request" ||
+      trigger.event === "pull_request_target"
+    ) {
+      domains.push({
+        event: trigger.event,
+        branches: [],
+        bases: branchCandidates(
+          trigger.filters.branches,
+          trigger.filters.branchesIgnore,
+          refLiterals.baseRef,
+          limitations,
+        ),
+        heads: headCandidates(refLiterals.headRef),
+        forks: [
+          { fork: false, actorClass: "internal" },
+          { fork: true, actorClass: "external" },
+        ],
+        fileSets: fileCandidates(trigger.filters, limitations),
+        inputCombos: [{}],
+        ...emptyExtras,
+      });
+    } else if (trigger.event === "schedule") {
+      domains.push({
+        event: "schedule",
+        branches: branchCandidates(
+          undefined,
+          undefined,
+          branchNamesFromRefs(refLiterals.ref),
+          limitations,
+        ),
+        bases: [],
+        heads: [],
+        forks: [{ fork: false, actorClass: "internal" }],
+        fileSets: [[]],
+        inputCombos: [{}],
+        schedules: trigger.schedules.map((s) => s.cron),
+        workflowRuns: [],
+      });
+    } else if (trigger.event === "workflow_run") {
+      domains.push({
+        event: "workflow_run",
+        branches: [],
+        bases: [],
+        heads: [],
+        forks: [{ fork: false, actorClass: "internal" }],
+        fileSets: [[]],
+        inputCombos: [{}],
+        schedules: [],
+        workflowRuns: workflowRunCandidates(trigger, referencesConclusion),
+      });
     }
-
-    // pull_request / pull_request_target
-    domains.push({
-      event: trigger.event,
-      branches: [],
-      bases: branchCandidates(
-        trigger.filters.branches,
-        trigger.filters.branchesIgnore,
-        refLiterals.baseRef,
-        limitations,
-      ),
-      heads: headCandidates(refLiterals.headRef),
-      forks: [
-        { fork: false, actorClass: "internal" },
-        { fork: true, actorClass: "external" },
-      ],
-      fileSets: fileCandidates(trigger.filters, limitations),
-      inputCombos: [{}],
-    });
   }
 
   return { domains, limitations };
+}
+
+function workflowRunCandidates(
+  trigger: WorkflowRunTrigger,
+  referencesConclusion: boolean,
+): WorkflowRunCandidate[] {
+  const names = trigger.workflows.length > 0 ? trigger.workflows : ["*"];
+  const branch = trigger.branches?.[0] ?? WORKFLOW_RUN_BRANCH;
+  const candidates: WorkflowRunCandidate[] = [];
+  for (const workflowName of names) {
+    for (const activity of trigger.types) {
+      if (activity === "completed" && referencesConclusion) {
+        for (const conclusion of REPRESENTATIVE_CONCLUSIONS) {
+          candidates.push({ workflowName, activity, branch, conclusion });
+        }
+      } else if (activity === "completed") {
+        candidates.push({
+          workflowName,
+          activity,
+          branch,
+          conclusion: "success",
+        });
+      } else {
+        candidates.push({ workflowName, activity, branch });
+      }
+    }
+  }
+  return candidates;
 }
 
 function collectRefLiterals(model: WorkflowModel): {

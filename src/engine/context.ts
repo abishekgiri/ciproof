@@ -67,6 +67,42 @@ function buildGithub(scenario: Scenario): ExpressionGithubContext {
         base_ref: scenario.baseRef ?? "",
         head_ref: scenario.headRef ?? "",
       };
+    case "schedule": {
+      // schedule: runs on the default branch; github.event.schedule is the cron.
+      const github: ExpressionGithubContext = {
+        event_name: "schedule",
+        ref: branchRef ?? "",
+        base_ref: "",
+        head_ref: "",
+      };
+      if (scenario.schedule !== undefined) {
+        github.event = { schedule: scenario.schedule };
+      }
+      return github;
+    }
+    case "workflow_run": {
+      // workflow_run: runs on the default branch; exposes upstream run payload.
+      const github: ExpressionGithubContext = {
+        event_name: "workflow_run",
+        ref: branchRef ?? "",
+        base_ref: "",
+        head_ref: "",
+      };
+      const run = scenario.workflowRun;
+      if (run) {
+        const workflow_run: NonNullable<
+          ExpressionGithubContext["event"]
+        >["workflow_run"] = {
+          name: run.workflowName,
+          head_branch: run.branch,
+        };
+        if (run.conclusion !== undefined) {
+          workflow_run.conclusion = run.conclusion;
+        }
+        github.event = { workflow_run };
+      }
+      return github;
+    }
   }
 }
 

@@ -161,6 +161,23 @@ function renderTrigger(lines: string[], trigger: TriggerModel): void {
     }
     return;
   }
+  if (trigger.event === "schedule") {
+    for (const entry of trigger.schedules) {
+      lines.push(`    cron: ${entry.cron}`);
+    }
+    return;
+  }
+  if (trigger.event === "workflow_run") {
+    lines.push(`    workflows: [${trigger.workflows.join(", ")}]`);
+    lines.push(`    types: [${trigger.types.join(", ")}]`);
+    if (trigger.branches) {
+      lines.push(`    branches: [${trigger.branches.join(", ")}]`);
+    }
+    if (trigger.branchesIgnore) {
+      lines.push(`    branches-ignore: [${trigger.branchesIgnore.join(", ")}]`);
+    }
+    return;
+  }
   const { filters } = trigger;
   if (filters.branches) {
     lines.push(`    branches: [${filters.branches.join(", ")}]`);
