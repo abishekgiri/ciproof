@@ -17,12 +17,16 @@ export type SupportedTriggerEvent =
   | "pull_request_target"
   | "workflow_dispatch"
   | "schedule"
-  | "workflow_run";
+  | "workflow_run"
+  | "workflow_call";
 
-/** Branch/path filters shared by push and pull-request-family events. */
+/** Branch/tag/path filters shared by push and pull-request-family events. */
 export interface BranchPathFilters {
   branches?: string[];
   branchesIgnore?: string[];
+  /** Tag filters (push only). */
+  tags?: string[];
+  tagsIgnore?: string[];
   paths?: string[];
   pathsIgnore?: string[];
 }
@@ -97,10 +101,33 @@ export interface WorkflowRunTrigger {
   source?: SourceLocation;
 }
 
+/** A `workflow_call` input (this workflow is reusable). */
+export interface WorkflowCallInput {
+  name: string;
+  type: "boolean" | "number" | "string";
+  required?: boolean;
+  default?: string | number | boolean;
+  description?: string;
+}
+
+export interface WorkflowCallSecret {
+  name: string;
+  required?: boolean;
+  description?: string;
+}
+
+export interface WorkflowCallTrigger {
+  event: "workflow_call";
+  inputs: WorkflowCallInput[];
+  secrets: WorkflowCallSecret[];
+  source?: SourceLocation;
+}
+
 export type TriggerModel =
   | PushTrigger
   | PullRequestTrigger
   | PullRequestTargetTrigger
   | WorkflowDispatchTrigger
   | ScheduleTrigger
-  | WorkflowRunTrigger;
+  | WorkflowRunTrigger
+  | WorkflowCallTrigger;

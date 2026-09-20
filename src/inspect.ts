@@ -19,7 +19,7 @@ import {
   normalizeWorkflow,
   type WorkflowNormalizationResult,
 } from "./github/normalize.js";
-import { discoverWorkflowFiles } from "./discovery.js";
+import { discoverWorkflowFiles, createFileProvider } from "./discovery.js";
 import { describeError } from "./github/diagnostics.js";
 
 export interface InspectOptions {
@@ -63,7 +63,10 @@ export async function runInspect(
       });
       continue;
     }
-    const result = await normalizeWorkflow({ filename: file.path, content });
+    const result = await normalizeWorkflow(
+      { filename: file.path, content },
+      { fileProvider: createFileProvider(options.root) },
+    );
     inspected.push({ file: file.path, result });
   }
 
@@ -178,12 +181,31 @@ function renderTrigger(lines: string[], trigger: TriggerModel): void {
     }
     return;
   }
+  if (trigger.event === "workflow_call") {
+    if (trigger.inputs.length > 0) {
+      lines.push(
+        `    inputs: [${trigger.inputs.map((i) => `${i.name}: ${i.type}`).join(", ")}]`,
+      );
+    }
+    if (trigger.secrets.length > 0) {
+      lines.push(
+        `    secrets: [${trigger.secrets.map((s) => s.name).join(", ")}]`,
+      );
+    }
+    return;
+  }
   const { filters } = trigger;
   if (filters.branches) {
     lines.push(`    branches: [${filters.branches.join(", ")}]`);
   }
   if (filters.branchesIgnore) {
     lines.push(`    branches-ignore: [${filters.branchesIgnore.join(", ")}]`);
+  }
+  if (filters.tags) {
+    lines.push(`    tags: [${filters.tags.join(", ")}]`);
+  }
+  if (filters.tagsIgnore) {
+    lines.push(`    tags-ignore: [${filters.tagsIgnore.join(", ")}]`);
   }
   if (filters.paths) {
     lines.push(`    paths: [${filters.paths.join(", ")}]`);

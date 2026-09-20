@@ -3,10 +3,11 @@ import { exploreWorkflow } from "../../src/engine/index.js";
 import { loadModel } from "../helpers/fixtures.js";
 
 describe("exploreWorkflow", () => {
-  it("A. explores a single-scenario workflow", async () => {
+  it("A. explores a bare push workflow (branch + tag) into one plan", async () => {
     const model = await loadModel("triggers/push.yml");
     const result = exploreWorkflow(model);
-    expect(result.scenariosEvaluated).toBe(1);
+    // `on: push` with no filters triggers on both branch and tag pushes.
+    expect(result.scenariosEvaluated).toBe(2);
     expect(result.plans).toHaveLength(1);
     expect(result.plans[0]?.jobs.build).toBe("run");
   });

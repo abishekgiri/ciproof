@@ -6,8 +6,9 @@
  * does NOT recurse. Behavior is read-only and deterministically ordered.
  */
 
-import { readdirSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, posix } from "node:path";
+import type { WorkflowFileProvider } from "./github/normalize.js";
 
 export interface DiscoveredWorkflow {
   /** Display path relative to the root, POSIX-style (e.g. `.github/workflows/ci.yml`). */
@@ -44,6 +45,25 @@ export function discoverWorkflowFiles(root: string): DiscoveredWorkflow[] {
       path: posix.join(...WORKFLOW_DIR, name),
       absolutePath: join(dir, name),
     }));
+}
+
+/**
+ * A file provider for local reusable-workflow resolution: reads repo-relative
+ * paths under `root`, read-only, refusing traversal outside the repo.
+ */
+export function createFileProvider(root: string): WorkflowFileProvider {
+  return {
+    read(path: string): string | undefined {
+      if (path.includes("..")) {
+        return undefined;
+      }
+      try {
+        return readFileSync(join(root, path), "utf8");
+      } catch {
+        return undefined;
+      }
+    },
+  };
 }
 
 function isWorkflowFile(name: string): boolean {
