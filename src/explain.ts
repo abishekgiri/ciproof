@@ -16,7 +16,7 @@ import {
   type WorkflowEvaluation,
 } from "./engine/index.js";
 import { normalizeWorkflow } from "./github/normalize.js";
-import { discoverWorkflowFiles } from "./discovery.js";
+import { discoverWorkflowFiles, createFileProvider } from "./discovery.js";
 
 export interface ExplainOptions {
   root: string;
@@ -53,7 +53,10 @@ export async function runExplain(
     } catch {
       continue;
     }
-    const { model } = await normalizeWorkflow({ filename: file.path, content });
+    const { model } = await normalizeWorkflow(
+      { filename: file.path, content },
+      { fileProvider: createFileProvider(options.root) },
+    );
     if (model && model.jobs.has(options.job)) {
       matches.push({
         model,

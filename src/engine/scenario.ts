@@ -21,6 +21,8 @@ export interface Scenario {
   /** Head (source) branch (pull_request / pull_request_target). */
   headRef?: string;
   /** Whether the triggering PR comes from a fork. */
+  /** For push: whether the pushed ref is a branch or a tag. Defaults to branch. */
+  refKind?: "branch" | "tag";
   fork: boolean;
   actorClass: "internal" | "external";
   /** Files changed in the event; used for path filters (explicit, not derived). */

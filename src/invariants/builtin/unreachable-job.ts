@@ -16,6 +16,13 @@ export function checkUnreachableJob(context: CheckContext): Finding[] {
   const { model, exploration } = context;
   const findings: Finding[] = [];
 
+  // No scenario-generating trigger (e.g. a workflow_call-only reusable workflow,
+  // or only unsupported events): jobs are call-only or untriggerable standalone,
+  // so CIProof has no basis to claim any job is unreachable.
+  if (exploration.evaluations.length === 0) {
+    return findings;
+  }
+
   for (const [jobId, job] of model.jobs) {
     const ranSomewhere = exploration.evaluations.some(
       (e) => e.jobs[jobId] === "run",

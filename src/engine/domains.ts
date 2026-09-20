@@ -21,7 +21,16 @@ import { isGlob, synthesizeNonMatch, synthesizeWitness } from "./witnesses.js";
 export interface AnalysisLimitation {
   kind: string;
   message: string;
+  /**
+   * Informational limitations are surfaced but do NOT make analysis partial —
+   * used for constructs that cannot affect structural reachability (e.g.
+   * concurrency scheduling/cancellation).
+   */
+  informational?: boolean;
 }
+
+/** Limitation kinds that are informational only (never completeness-breaking). */
+const INFORMATIONAL_KINDS = new Set(["concurrency"]);
 
 export interface ForkVariant {
   fork: boolean;
@@ -37,6 +46,8 @@ export interface EventDomain {
   /** Head-branch candidates (pull_request family). */
   heads: string[];
   forks: ForkVariant[];
+  /** Tag candidates (push tag refs). */
+  tags: string[];
   /** Changed-file candidate sets. */
   fileSets: string[][];
   /** Full assignments over supported dispatch inputs. */
@@ -63,21 +74,25 @@ const HEAD_GENERIC = "ciproof-head";
 const WORKFLOW_RUN_BRANCH = "ciproof-upstream";
 const REPRESENTATIVE_CONCLUSIONS = ["success", "failure"];
 
+function toLimitation(kind: string, message: string): AnalysisLimitation {
+  return INFORMATIONAL_KINDS.has(kind)
+    ? { kind, message, informational: true }
+    : { kind, message };
+}
+
 /** Build the per-event scenario domains for a workflow. */
 export function buildDomains(model: WorkflowModel): DomainBuild {
   const limitations: AnalysisLimitation[] = [];
 
-  // Unsupported constructs are visible limitations (they make analysis partial).
+  // Unsupported constructs are visible limitations. Most make analysis partial;
+  // informational ones (e.g. concurrency) are surfaced but do not.
   for (const item of model.unsupported) {
-    limitations.push({ kind: "unsupported-construct", message: item.message });
+    limitations.push(toLimitation(item.kind, item.message));
   }
   const refLiterals = collectRefLiterals(model);
   for (const job of model.jobs.values()) {
     for (const item of job.unsupported) {
-      limitations.push({
-        kind: "unsupported-construct",
-        message: item.message,
-      });
+      limitations.push(toLimitation(item.kind, item.message));
     }
   }
 
@@ -88,7 +103,7 @@ export function buildDomains(model: WorkflowModel): DomainBuild {
   );
 
   for (const trigger of model.triggers) {
-    const emptyExtras = { schedules: [], workflowRuns: [] };
+    const emptyExtras = { schedules: [], workflowRuns: [], tags: [] };
     if (trigger.event === "workflow_dispatch") {
       domains.push({
         event: "workflow_dispatch",
@@ -106,20 +121,37 @@ export function buildDomains(model: WorkflowModel): DomainBuild {
         ...emptyExtras,
       });
     } else if (trigger.event === "push") {
+      const bf = trigger.filters;
+      const hasBranch = !!(bf.branches || bf.branchesIgnore);
+      const hasTag = !!(bf.tags || bf.tagsIgnore);
+      const genBranch = hasBranch || !hasTag; // branches, or neither
+      const genTag = hasTag || !hasBranch; // tags, or neither
       domains.push({
         event: "push",
-        branches: branchCandidates(
-          trigger.filters.branches,
-          trigger.filters.branchesIgnore,
-          branchNamesFromRefs(refLiterals.ref),
-          limitations,
-        ),
+        branches: genBranch
+          ? branchCandidates(
+              bf.branches,
+              bf.branchesIgnore,
+              branchNamesFromRefs(refLiterals.ref),
+              limitations,
+            )
+          : [],
+        tags: genTag
+          ? branchCandidates(
+              bf.tags,
+              bf.tagsIgnore,
+              tagNamesFromRefs(refLiterals.ref),
+              limitations,
+              "ciproof-tag",
+            )
+          : [],
         bases: [],
         heads: [],
         forks: [{ fork: false, actorClass: "internal" }],
         fileSets: fileCandidates(trigger.filters, limitations),
         inputCombos: [{}],
-        ...emptyExtras,
+        schedules: [],
+        workflowRuns: [],
       });
     } else if (
       trigger.event === "pull_request" ||
@@ -152,6 +184,7 @@ export function buildDomains(model: WorkflowModel): DomainBuild {
           branchNamesFromRefs(refLiterals.ref),
           limitations,
         ),
+        tags: [],
         bases: [],
         heads: [],
         forks: [{ fork: false, actorClass: "internal" }],
@@ -164,6 +197,7 @@ export function buildDomains(model: WorkflowModel): DomainBuild {
       domains.push({
         event: "workflow_run",
         branches: [],
+        tags: [],
         bases: [],
         heads: [],
         forks: [{ fork: false, actorClass: "internal" }],
@@ -228,10 +262,18 @@ function collectRefLiterals(model: WorkflowModel): {
 
 /** Map `refs/heads/<branch>` literals to branch names; skip non-branch refs. */
 function branchNamesFromRefs(refs: string[]): string[] {
+  return namesFromRefs(refs, "refs/heads/");
+}
+
+function tagNamesFromRefs(refs: string[]): string[] {
+  return namesFromRefs(refs, "refs/tags/");
+}
+
+function namesFromRefs(refs: string[], prefix: string): string[] {
   const names: string[] = [];
   for (const ref of refs) {
-    if (ref.startsWith("refs/heads/")) {
-      names.push(ref.slice("refs/heads/".length));
+    if (ref.startsWith(prefix)) {
+      names.push(ref.slice(prefix.length));
     }
   }
   return names;
@@ -242,6 +284,7 @@ function branchCandidates(
   ignore: string[] | undefined,
   literals: string[],
   limitations: AnalysisLimitation[],
+  generic = "main",
 ): string[] {
   const set = new Set<string>();
 
@@ -283,7 +326,7 @@ function branchCandidates(
   }
 
   if (set.size === 0) {
-    set.add("main");
+    set.add(generic);
   }
   return [...set].sort((a, b) => a.localeCompare(b));
 }

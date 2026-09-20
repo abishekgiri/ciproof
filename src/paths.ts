@@ -13,7 +13,7 @@ import {
   type Scenario,
 } from "./engine/index.js";
 import { normalizeWorkflow } from "./github/normalize.js";
-import { discoverWorkflowFiles } from "./discovery.js";
+import { discoverWorkflowFiles, createFileProvider } from "./discovery.js";
 
 export interface PathsOptions {
   root: string;
@@ -50,7 +50,10 @@ export async function runPaths(options: PathsOptions): Promise<PathsResult> {
       explored.push({ file: file.path });
       continue;
     }
-    const { model } = await normalizeWorkflow({ filename: file.path, content });
+    const { model } = await normalizeWorkflow(
+      { filename: file.path, content },
+      { fileProvider: createFileProvider(options.root) },
+    );
     if (!model) {
       explored.push({ file: file.path });
       continue;
@@ -108,6 +111,17 @@ function renderText(
       lines.push(
         `  Analysis truncated after ${maxScenarios} scenarios. Results are partial.`,
       );
+    }
+    const notes = [
+      ...new Set(
+        result.limitations.filter((l) => l.informational).map((l) => l.message),
+      ),
+    ];
+    if (notes.length > 0) {
+      lines.push("  Notes (do not affect reachability):");
+      for (const note of notes) {
+        lines.push(`    - ${note}`);
+      }
     }
     lines.push("");
 
@@ -186,7 +200,9 @@ function renderScenario(lines: string[], scenario: Scenario): void {
 }
 
 function uniqueLimitations(result: ExplorationResult): string[] {
-  const messages = result.limitations.map((l) => l.message);
+  const messages = result.limitations
+    .filter((l) => !l.informational)
+    .map((l) => l.message);
   const hasUnknownPlan = result.plans.some(
     (plan) =>
       plan.trigger === "unknown" ||

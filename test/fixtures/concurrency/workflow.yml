@@ -1,0 +1,12 @@
+# Purpose: workflow-level concurrency must not make analysis partial; structural
+# reachability is unaffected.
+name: concurrency-workflow
+on: push
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
