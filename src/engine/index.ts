@@ -26,6 +26,25 @@ export {
 } from "./needs.js";
 export { buildEventContext, type EventContext } from "./context.js";
 export {
+  exploreWorkflow,
+  type ExplorationResult,
+  type ExecutionPlan,
+  type Completeness,
+} from "./explorer.js";
+export {
+  buildDomains,
+  type EventDomain,
+  type AnalysisLimitation,
+} from "./domains.js";
+export { generateScenarios, type ScenarioGeneration } from "./scenarios.js";
+export { behaviorSignature } from "./signatures.js";
+export {
+  DEFAULT_LIMITS,
+  DEFAULT_MAX_SCENARIOS,
+  type ExplorationLimits,
+} from "./limits.js";
+export { isGlob, synthesizeWitness, synthesizeNonMatch } from "./witnesses.js";
+export {
   evidence,
   type Evidence,
   type JobExecution,
