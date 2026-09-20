@@ -15,12 +15,13 @@ describe("cli scaffold", () => {
     expect(buildProgram().version()).toBeDefined();
   });
 
-  it("registers inspect but no analysis commands yet", () => {
-    // Phase 1 boundary: inspect exists; behavioral analysis does not.
+  it("registers inspect and explain, but no multi-scenario commands yet", () => {
+    // Phase 2 boundary: inspect + explain exist; check / paths (scenario
+    // exploration and invariants) do not.
     const names = buildProgram().commands.map((c) => c.name());
     expect(names).toContain("inspect");
+    expect(names).toContain("explain");
     expect(names).not.toContain("check");
     expect(names).not.toContain("paths");
-    expect(names).not.toContain("explain");
   });
 });

@@ -1,15 +1,46 @@
 /**
  * Adapter over `@actions/expressions`.
  *
- * Phase 1 uses it to REPRESENT a `jobs.<id>.if` expression: parse it for
- * syntactic validity and extract the root identifiers it references. It does
- * NOT evaluate the expression against any context — that is Phase 2. No
- * `@actions/expressions` types leak past this module.
+ * - Phase 1 REPRESENTS a `jobs.<id>.if` expression (parse validity +
+ *   referenced root identifiers).
+ * - Phase 2 EVALUATES an expression against a concrete context with
+ *   three-valued (`true`/`false`/`unknown`) semantics.
+ *
+ * All `@actions/expressions` types stay inside this module; callers see only
+ * CIProof-owned types (`Truth`, `ExpressionContext`, `ConditionParseResult`).
  */
 
-import { Lexer, Parser, wellKnownFunctions } from "@actions/expressions";
+import {
+  Lexer,
+  Parser,
+  wellKnownFunctions,
+  Evaluator,
+} from "@actions/expressions";
+import {
+  Kind,
+  Dictionary,
+  BooleanData,
+  StringData,
+  type ExpressionData,
+} from "@actions/expressions/data/index";
 import { TokenType } from "@actions/expressions/lexer";
-import type { FunctionInfo } from "@actions/expressions/funcs/info";
+import type {
+  FunctionInfo,
+  FunctionDefinition,
+} from "@actions/expressions/funcs/info";
+import type {
+  Expr,
+  ExprVisitor,
+  Literal,
+  Unary,
+  Binary,
+  Logical,
+  Grouping,
+  ContextAccess,
+  IndexAccess,
+  FunctionCall,
+} from "@actions/expressions/ast";
+import { andTruth, orTruth, notTruth, type Truth } from "../model/truth.js";
 
 /** Result of parsing a raw condition expression. */
 export interface ConditionParseResult {
@@ -112,4 +143,312 @@ function rootIdentifiers(
     }
   }
   return roots;
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2: three-valued expression evaluation
+// ---------------------------------------------------------------------------
+
+/** The `github` context fields CIProof models for v0.1 expressions. */
+export interface ExpressionGithubContext {
+  event_name: string;
+  ref: string;
+  base_ref: string;
+  head_ref: string;
+}
+
+/** Concrete evaluation context. All values are CIProof-owned primitives. */
+export interface ExpressionContext {
+  github: ExpressionGithubContext;
+  /** Declared/supplied input values with a known value. */
+  inputs: Record<string, boolean | string>;
+  /** Declared inputs whose value is not known in this scenario. */
+  unknownInputs: string[];
+  /** The value of `success()` for the current job. */
+  successValue: Truth;
+}
+
+export interface ExpressionEvaluation {
+  truth: Truth;
+  /** Parser error, when the expression could not be parsed. */
+  error?: string;
+}
+
+const MODELED_GITHUB_FIELDS = new Set([
+  "event_name",
+  "ref",
+  "base_ref",
+  "head_ref",
+]);
+
+const UNMODELED_FUNCTIONS = new Set(["failure", "cancelled", "hashfiles"]);
+const WELL_KNOWN_NAMES = new Set(
+  Object.values(wellKnownFunctions).map((f) => f.name.toLowerCase()),
+);
+
+/**
+ * Evaluate a raw `if` expression against a concrete context, three-valued.
+ *
+ * Atomic sub-expressions whose every referenced context path and function is
+ * modeled-and-known are evaluated by GitHub's own evaluator (faithful operator
+ * and coercion semantics). Anything referencing an unmodeled context field,
+ * an unknown input, or an unmodeled function (`failure`, `cancelled`, …) yields
+ * `unknown`. Boolean composition (`&&`, `||`, `!`) is three-valued, so a
+ * decidable branch (e.g. `false && failure()`) still resolves.
+ */
+export function evaluateExpression(
+  raw: string,
+  ctx: ExpressionContext,
+): ExpressionEvaluation {
+  let ast: Expr;
+  try {
+    const { tokens } = new Lexer(raw).lex();
+    ast = new Parser(tokens, NAMED_CONTEXTS, FUNCTIONS).parse();
+  } catch (err) {
+    return {
+      truth: "unknown",
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+
+  const context = buildContextDictionary(ctx);
+  const functions = buildFunctions(ctx);
+  const unknownInputs = new Set(ctx.unknownInputs);
+  const successKnown = ctx.successValue !== "unknown";
+
+  const modeled = new ModelabilityVisitor(unknownInputs, successKnown);
+  const evaluator = new TruthVisitor(modeled, context, functions);
+
+  try {
+    return { truth: ast.accept(evaluator) };
+  } catch {
+    return { truth: "unknown" };
+  }
+}
+
+function buildContextDictionary(ctx: ExpressionContext): Dictionary {
+  const github = new Dictionary(
+    { key: "event_name", value: new StringData(ctx.github.event_name) },
+    { key: "ref", value: new StringData(ctx.github.ref) },
+    { key: "base_ref", value: new StringData(ctx.github.base_ref) },
+    { key: "head_ref", value: new StringData(ctx.github.head_ref) },
+  );
+
+  const inputs = new Dictionary();
+  for (const [name, value] of Object.entries(ctx.inputs)) {
+    inputs.add(
+      name,
+      typeof value === "boolean"
+        ? new BooleanData(value)
+        : new StringData(value),
+    );
+  }
+
+  return new Dictionary(
+    { key: "github", value: github },
+    { key: "inputs", value: inputs },
+  );
+}
+
+function buildFunctions(
+  ctx: ExpressionContext,
+): Map<string, FunctionDefinition> {
+  const functions = new Map<string, FunctionDefinition>();
+  for (const fn of Object.values(wellKnownFunctions)) {
+    functions.set(fn.name.toLowerCase(), fn as FunctionDefinition);
+  }
+  functions.set("always", {
+    name: "always",
+    minArgs: 0,
+    maxArgs: 0,
+    call: () => new BooleanData(true),
+  });
+  functions.set("success", {
+    name: "success",
+    minArgs: 0,
+    maxArgs: 0,
+    call: () => new BooleanData(ctx.successValue === "true"),
+  });
+  return functions;
+}
+
+/** GitHub's boolean coercion for an expression result. */
+function coerceBoolean(data: ExpressionData): boolean {
+  switch (data.kind) {
+    case Kind.Null:
+      return false;
+    case Kind.Boolean:
+      return (data as BooleanData).value;
+    case Kind.Number: {
+      const n = data.number();
+      return n !== 0 && !Number.isNaN(n);
+    }
+    case Kind.String:
+      return data.coerceString().length > 0;
+    default:
+      return true; // arrays and dictionaries are truthy
+  }
+}
+
+interface ResolvedPath {
+  root: string;
+  segments: string[];
+}
+
+/** Interpret a node as a static context path (`github.ref`), or null. */
+const pathVisitor: ExprVisitor<ResolvedPath | null> = {
+  visitContextAccess: (node: ContextAccess) => ({
+    root: node.name.lexeme,
+    segments: [],
+  }),
+  visitIndexAccess: (node: IndexAccess) => {
+    const base = node.expr.accept(pathVisitor);
+    if (base === null) {
+      return null;
+    }
+    const key = node.index.accept(stringKeyVisitor);
+    if (key === null) {
+      return null;
+    }
+    return { root: base.root, segments: [...base.segments, key] };
+  },
+  visitLiteral: () => null,
+  visitUnary: () => null,
+  visitBinary: () => null,
+  visitLogical: () => null,
+  visitGrouping: () => null,
+  visitFunctionCall: () => null,
+};
+
+/** Extract a static string index (the `b` in `a.b` / `a['b']`), or null. */
+const stringKeyVisitor: ExprVisitor<string | null> = {
+  visitLiteral: (node: Literal) =>
+    node.literal.kind === Kind.String ? node.literal.coerceString() : null,
+  visitContextAccess: () => null,
+  visitIndexAccess: () => null,
+  visitUnary: () => null,
+  visitBinary: () => null,
+  visitLogical: () => null,
+  visitGrouping: () => null,
+  visitFunctionCall: () => null,
+};
+
+/** Decides whether a subtree references only modeled, known values. */
+class ModelabilityVisitor implements ExprVisitor<boolean> {
+  constructor(
+    private readonly unknownInputs: Set<string>,
+    private readonly successKnown: boolean,
+  ) {}
+
+  visitLiteral(): boolean {
+    return true;
+  }
+  visitGrouping(node: Grouping): boolean {
+    return node.group.accept(this);
+  }
+  visitUnary(node: Unary): boolean {
+    return node.expr.accept(this);
+  }
+  visitBinary(node: Binary): boolean {
+    return node.left.accept(this) && node.right.accept(this);
+  }
+  visitLogical(node: Logical): boolean {
+    return node.args.every((arg) => arg.accept(this));
+  }
+  visitContextAccess(node: ContextAccess): boolean {
+    return this.pathModeled({ root: node.name.lexeme, segments: [] });
+  }
+  visitIndexAccess(node: IndexAccess): boolean {
+    const path = node.accept(pathVisitor);
+    return path !== null && this.pathModeled(path);
+  }
+  visitFunctionCall(node: FunctionCall): boolean {
+    const name = node.functionName.lexeme.toLowerCase();
+    if (UNMODELED_FUNCTIONS.has(name)) {
+      return false;
+    }
+    const argsModeled = node.args.every((arg) => arg.accept(this));
+    if (name === "success") {
+      return this.successKnown && argsModeled;
+    }
+    if (name === "always") {
+      return argsModeled;
+    }
+    if (WELL_KNOWN_NAMES.has(name)) {
+      return argsModeled;
+    }
+    return false;
+  }
+
+  private pathModeled(path: ResolvedPath): boolean {
+    if (path.root === "github") {
+      return (
+        path.segments.length === 1 &&
+        MODELED_GITHUB_FIELDS.has(path.segments[0] as string)
+      );
+    }
+    if (path.root === "inputs") {
+      return (
+        path.segments.length === 1 &&
+        !this.unknownInputs.has(path.segments[0] as string)
+      );
+    }
+    return false;
+  }
+}
+
+/** Evaluates an expression to `Truth`, delegating atomics to GitHub's evaluator. */
+class TruthVisitor implements ExprVisitor<Truth> {
+  constructor(
+    private readonly modeled: ModelabilityVisitor,
+    private readonly context: Dictionary,
+    private readonly functions: Map<string, FunctionDefinition>,
+  ) {}
+
+  visitGrouping(node: Grouping): Truth {
+    return node.group.accept(this);
+  }
+  visitLogical(node: Logical): Truth {
+    const values = node.args.map((arg) => arg.accept(this));
+    return node.operator.type === TokenType.AND
+      ? andTruth(values)
+      : orTruth(values);
+  }
+  visitUnary(node: Unary): Truth {
+    if (node.operator.type === TokenType.BANG) {
+      return notTruth(node.expr.accept(this));
+    }
+    return this.atomic(node);
+  }
+  visitLiteral(node: Literal): Truth {
+    return this.atomic(node);
+  }
+  visitBinary(node: Binary): Truth {
+    return this.atomic(node);
+  }
+  visitContextAccess(node: ContextAccess): Truth {
+    return this.atomic(node);
+  }
+  visitIndexAccess(node: IndexAccess): Truth {
+    return this.atomic(node);
+  }
+  visitFunctionCall(node: FunctionCall): Truth {
+    return this.atomic(node);
+  }
+
+  private atomic(node: Expr): Truth {
+    if (!node.accept(this.modeled)) {
+      return "unknown";
+    }
+    try {
+      const result = new Evaluator(
+        node,
+        this.context,
+        this.functions,
+      ).evaluate();
+      return coerceBoolean(result) ? "true" : "false";
+    } catch {
+      return "unknown";
+    }
+  }
 }
