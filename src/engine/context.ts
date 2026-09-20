@@ -80,6 +80,16 @@ function buildGithub(scenario: Scenario): ExpressionGithubContext {
       }
       return github;
     }
+    case "workflow_call": {
+      // A reusable workflow inherits the caller's github context; standalone it
+      // has no independent event. Provide a minimal default-branch context.
+      return {
+        event_name: "workflow_call",
+        ref: branchRef ?? "",
+        base_ref: "",
+        head_ref: "",
+      };
+    }
     case "workflow_run": {
       // workflow_run: runs on the default branch; exposes upstream run payload.
       const github: ExpressionGithubContext = {

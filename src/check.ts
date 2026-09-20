@@ -20,7 +20,7 @@ import {
   type PrerequisiteRule,
 } from "./invariants/index.js";
 import { normalizeWorkflow } from "./github/normalize.js";
-import { discoverWorkflowFiles } from "./discovery.js";
+import { discoverWorkflowFiles, createFileProvider } from "./discovery.js";
 
 export interface CheckCliOptions {
   root: string;
@@ -57,7 +57,10 @@ export async function runCheck(options: CheckCliOptions): Promise<CheckResult> {
       checked.push({ file: file.path, findings: [] });
       continue;
     }
-    const { model } = await normalizeWorkflow({ filename: file.path, content });
+    const { model } = await normalizeWorkflow(
+      { filename: file.path, content },
+      { fileProvider: createFileProvider(options.root) },
+    );
     if (!model) {
       checked.push({ file: file.path, findings: [] });
       continue;

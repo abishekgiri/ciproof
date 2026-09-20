@@ -1,0 +1,10 @@
+# Purpose: tag-only push filter; branch pushes must not trigger.
+name: tags-only
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

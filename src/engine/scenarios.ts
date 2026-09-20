@@ -61,6 +61,7 @@ function* scenariosForDomain(domain: EventDomain): Generator<Scenario> {
         for (const changedFiles of domain.fileSets) {
           yield {
             event: "push",
+            refKind: "branch",
             branch,
             ref: `refs/heads/${branch}`,
             fork: false,
@@ -69,6 +70,18 @@ function* scenariosForDomain(domain: EventDomain): Generator<Scenario> {
             inputs: {},
           };
         }
+      }
+      // Tag pushes: path filters do not apply, so no changed-file dimension.
+      for (const tag of domain.tags) {
+        yield {
+          event: "push",
+          refKind: "tag",
+          ref: `refs/tags/${tag}`,
+          fork: false,
+          actorClass: "internal",
+          changedFiles: [],
+          inputs: {},
+        };
       }
       return;
     case "workflow_dispatch":

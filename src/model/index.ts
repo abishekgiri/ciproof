@@ -34,7 +34,12 @@ export type {
   ScheduleEntry,
   WorkflowRunTrigger,
   WorkflowRunActivity,
+  WorkflowCallTrigger,
+  WorkflowCallInput,
+  WorkflowCallSecret,
 } from "./trigger.js";
+export type { ReusableWorkflowCall, ReusableTarget } from "./reusable.js";
+export { MAX_REUSABLE_DEPTH } from "./reusable.js";
 export type {
   MatrixModel,
   StaticMatrixModel,

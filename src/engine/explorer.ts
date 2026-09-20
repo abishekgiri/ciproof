@@ -130,7 +130,7 @@ function computeCompleteness(
   limitations: AnalysisLimitation[],
   plans: ExecutionPlan[],
 ): Completeness {
-  if (truncated || limitations.length > 0) {
+  if (truncated || limitations.some((l) => !l.informational)) {
     return "partial";
   }
   const hasUnknown = plans.some(

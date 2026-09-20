@@ -10,6 +10,7 @@
 
 import type {
   BranchPathFilters,
+  SourceLocation,
   TriggerModel,
   WorkflowModel,
   WorkflowRunTrigger,
@@ -73,6 +74,24 @@ export function evaluateTrigger(
     return evaluateWorkflowRun(trigger, scenario);
   }
 
+  if (trigger.event === "push") {
+    return evaluatePush(trigger.filters, scenario, trigger.source);
+  }
+
+  if (trigger.event === "workflow_call") {
+    // Reusable workflows run only when called; no standalone scenario matches.
+    return {
+      match: "not-matched",
+      evidence: [
+        evidence(
+          "info",
+          "workflow_call runs only when invoked by another workflow",
+          trigger.source,
+        ),
+      ],
+    };
+  }
+
   const ev: Evidence[] = [
     evidence("pass", `event ${scenario.event} matched`, trigger.source),
   ];
@@ -87,6 +106,91 @@ export function evaluateTrigger(
 
   const combined = andTruth([branchResult, pathResult]);
   return { match: truthToMatch(combined), evidence: ev };
+}
+
+/**
+ * Push trigger evaluation with branch/tag ref-kind rules:
+ * - only tag filters -> branch pushes do not trigger (and vice versa);
+ * - neither -> both branches and tags trigger;
+ * - path filters are IGNORED for tag pushes (GitHub semantics).
+ */
+function evaluatePush(
+  filters: BranchPathFilters,
+  scenario: Scenario,
+  source: SourceLocation | undefined,
+): TriggerEvaluation {
+  const ev: Evidence[] = [];
+  const hasBranchFilters = !!(filters.branches || filters.branchesIgnore);
+  const hasTagFilters = !!(filters.tags || filters.tagsIgnore);
+  const refKind = scenario.refKind ?? "branch";
+
+  if (refKind === "tag") {
+    if (hasBranchFilters && !hasTagFilters) {
+      ev.push(
+        evidence("fail", "tag push does not trigger a branch-only push filter"),
+      );
+      return { match: "not-matched", evidence: ev };
+    }
+    ev.push(evidence("pass", "push (tag) matched", source));
+    const tag = tagFromRef(scenario.ref);
+    const tagResult = matchTagFilters(filters, tag, ev);
+    // Path filters are not evaluated for tag pushes.
+    return { match: truthToMatch(tagResult), evidence: ev };
+  }
+
+  // Branch push.
+  if (hasTagFilters && !hasBranchFilters) {
+    ev.push(
+      evidence("fail", "branch push does not trigger a tag-only push filter"),
+    );
+    return { match: "not-matched", evidence: ev };
+  }
+  ev.push(evidence("pass", "push (branch) matched", source));
+  const branch = scenario.branch ?? branchFromRef(scenario.ref);
+  const branchResult = matchBranchFilters(filters, branch, ev);
+  const pathResult = matchPathFilters(filters, scenario.changedFiles, ev);
+  return {
+    match: truthToMatch(andTruth([branchResult, pathResult])),
+    evidence: ev,
+  };
+}
+
+function matchTagFilters(
+  filters: BranchPathFilters,
+  tag: string | undefined,
+  ev: Evidence[],
+): Truth {
+  if (!filters.tags && !filters.tagsIgnore) {
+    return "true";
+  }
+  if (tag === undefined) {
+    ev.push(evidence("unknown", "tag is unknown; tag filter unresolved"));
+    return "unknown";
+  }
+  if (filters.tags) {
+    const matched = matchesAny(tag, filters.tags);
+    ev.push(
+      evidence(
+        matched ? "pass" : "fail",
+        `tag "${tag}" ${matched ? "matches" : "does not match"} tags [${filters.tags.join(", ")}]`,
+      ),
+    );
+    return matched ? "true" : "false";
+  }
+  const ignored = matchesAny(tag, filters.tagsIgnore ?? []);
+  ev.push(
+    evidence(
+      ignored ? "fail" : "pass",
+      `tag "${tag}" ${ignored ? "is excluded by" : "is not excluded by"} tags-ignore`,
+    ),
+  );
+  return ignored ? "false" : "true";
+}
+
+function tagFromRef(ref: string | undefined): string | undefined {
+  return ref?.startsWith("refs/tags/")
+    ? ref.slice("refs/tags/".length)
+    : undefined;
 }
 
 function evaluateWorkflowRun(

@@ -1,0 +1,13 @@
+# Purpose: ordered positive/negative/positive tag patterns (last-match-wins).
+name: tags-ordered
+on:
+  push:
+    tags:
+      - "v*"
+      - "!v*-beta"
+      - "v-special-beta"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

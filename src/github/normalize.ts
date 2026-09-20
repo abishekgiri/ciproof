@@ -47,11 +47,16 @@ import {
   type ModelDiagnostic,
   type PermissionLevel,
   type PermissionModel,
+  type ReusableWorkflowCall,
+  type ReusableTarget,
   type ScheduleEntry,
   type TriggerModel,
   type UnsupportedConstruct,
   type WorkflowModel,
   type WorkflowRunActivity,
+  type WorkflowCallInput,
+  type WorkflowCallSecret,
+  MAX_REUSABLE_DEPTH,
 } from "../model/index.js";
 import type { BranchPathFilters } from "../model/trigger.js";
 import type { SourceLocation } from "../model/source.js";
@@ -67,15 +72,48 @@ export interface WorkflowNormalizationResult {
   diagnostics: ModelDiagnostic[];
 }
 
+/** Reads a repo-relative workflow file's content (for local reusable calls). */
+export interface WorkflowFileProvider {
+  read(path: string): string | undefined;
+}
+
+export interface NormalizeOptions {
+  /** Enables local reusable-workflow resolution when provided. */
+  fileProvider?: WorkflowFileProvider;
+}
+
+interface ResolutionContext {
+  provider: WorkflowFileProvider | undefined;
+  depth: number;
+  visiting: Set<string>;
+  memo: Map<string, WorkflowModel | null>;
+}
+
 /**
  * Parse and normalize a single workflow source into a CIProof `WorkflowModel`.
  *
  * - Parser failure (no document, or parser errors) -> no model + diagnostics.
  * - Valid workflow -> model (with any unsupported constructs marked).
  * - Converter/graph problems -> model plus diagnostics; never a crash.
+ *
+ * When a `fileProvider` is supplied, local reusable-workflow calls
+ * (`./.github/workflows/x.yml`) are resolved into nested models.
  */
 export async function normalizeWorkflow(
   input: ParseWorkflowSourceInput,
+  options: NormalizeOptions = {},
+): Promise<WorkflowNormalizationResult> {
+  return normalizeTree(input, {
+    provider: options.fileProvider,
+    depth: 0,
+    visiting: new Set([input.filename]),
+    memo: new Map(),
+  });
+}
+
+async function normalizeTree(
+  input: ParseWorkflowSourceInput,
+  ctx: ResolutionContext,
 ): Promise<WorkflowNormalizationResult> {
   const { filename } = input;
   const diagnostics: ModelDiagnostic[] = [];
@@ -128,6 +166,8 @@ export async function normalizeWorkflow(
 
   const root = isMapping(parsed.value) ? parsed.value : undefined;
   const model = buildModel(filename, template, root);
+
+  await resolveReusableCalls(model, ctx);
 
   diagnostics.push(...validateNeeds(model));
 
@@ -186,23 +226,11 @@ function buildTriggers(
     const source = eventSource(file, onToken, event);
 
     if (event === "push") {
-      const pushConfig = template.events.push;
       triggers.push({
         event: "push",
-        filters: filtersOf(pushConfig),
+        filters: filtersOf(template.events.push),
         ...withSource(source),
       });
-      // Tag filters affect which refs trigger the run, and CIProof does not
-      // model tag refs. Record a limitation so reachability stays honest
-      // (otherwise a tag-gated job looks unreachable).
-      if (pushConfig?.tags || pushConfig?.["tags-ignore"]) {
-        unsupported.push({
-          kind: "tag-filter",
-          message:
-            "push tag filters (tags/tags-ignore) are not modeled by CIProof v0.1",
-          ...withSource(source),
-        });
-      }
     } else if (event === "pull_request") {
       triggers.push({
         event: "pull_request",
@@ -233,6 +261,12 @@ function buildTriggers(
         ...buildWorkflowRun(template.events.workflow_run),
         ...withSource(source),
       });
+    } else if (event === "workflow_call") {
+      triggers.push({
+        event: "workflow_call",
+        ...buildWorkflowCall(template.events.workflow_call),
+        ...withSource(source),
+      });
     } else {
       unsupported.push({
         kind: "unsupported-trigger",
@@ -257,6 +291,13 @@ function filtersOf(
   }
   if (config["branches-ignore"]) {
     filters.branchesIgnore = [...config["branches-ignore"]];
+  }
+  const tagConfig = config as { tags?: string[]; "tags-ignore"?: string[] };
+  if (tagConfig.tags) {
+    filters.tags = [...tagConfig.tags];
+  }
+  if (tagConfig["tags-ignore"]) {
+    filters.tagsIgnore = [...tagConfig["tags-ignore"]];
   }
   if (config.paths) {
     filters.paths = [...config.paths];
@@ -315,6 +356,40 @@ function buildWorkflowRun(config: WorkflowTemplate["events"]["workflow_run"]): {
     result.branchesIgnore = [...config["branches-ignore"]];
   }
   return result;
+}
+
+function buildWorkflowCall(
+  config: WorkflowTemplate["events"]["workflow_call"],
+): { inputs: WorkflowCallInput[]; secrets: WorkflowCallSecret[] } {
+  const inputs: WorkflowCallInput[] = [];
+  for (const [name, raw] of Object.entries(config?.inputs ?? {})) {
+    const rawType = String(raw.type);
+    const type: WorkflowCallInput["type"] =
+      rawType === "boolean" || rawType === "number" ? rawType : "string";
+    const input: WorkflowCallInput = { name, type };
+    if (raw.required !== undefined) {
+      input.required = raw.required;
+    }
+    if (raw.default !== undefined && typeof raw.default !== "object") {
+      input.default = raw.default;
+    }
+    if (raw.description !== undefined) {
+      input.description = raw.description;
+    }
+    inputs.push(input);
+  }
+  const secrets: WorkflowCallSecret[] = [];
+  for (const [name, raw] of Object.entries(config?.secrets ?? {})) {
+    const secret: WorkflowCallSecret = { name };
+    if (raw?.required !== undefined) {
+      secret.required = raw.required;
+    }
+    if (raw?.description !== undefined) {
+      secret.description = raw.description;
+    }
+    secrets.push(secret);
+  }
+  return { inputs, secrets };
 }
 
 function buildInputs(
@@ -445,13 +520,175 @@ function buildJob(
       });
     }
   } else {
-    unsupported.push({
-      kind: "reusable-workflow-job",
-      message: `job "${job.id.value}" calls a reusable workflow, which is not modeled by CIProof v0.1`,
-    });
+    const call = rawJob ? buildReusableCall(rawJob) : undefined;
+    if (call) {
+      model.reusableCall = call;
+      if (call.target.kind === "external") {
+        unsupported.push({
+          kind: "external-reusable-workflow",
+          message: `job "${job.id.value}" calls an external reusable workflow (${call.target.raw}), which is not modeled by CIProof v0.1`,
+        });
+      }
+      // Local calls are resolved (and any limitation added) in a later pass.
+    } else {
+      unsupported.push({
+        kind: "reusable-workflow-job",
+        message: `job "${job.id.value}" calls a reusable workflow that could not be parsed`,
+      });
+    }
   }
 
   return model;
+}
+
+/**
+ * Resolve local reusable-workflow calls into nested models (async pass, run
+ * after the synchronous model build). External/missing/cyclic/too-deep targets
+ * record a limitation; successful local resolution adds none (now supported).
+ */
+async function resolveReusableCalls(
+  model: WorkflowModel,
+  ctx: ResolutionContext,
+): Promise<void> {
+  for (const job of model.jobs.values()) {
+    const call = job.reusableCall;
+    if (!call || call.target.kind !== "local") {
+      continue;
+    }
+    const path = call.target.path;
+
+    if (!isSafeLocalPath(path)) {
+      call.resolutionError = "invalid-path";
+      job.unsupported.push({
+        kind: "reusable-workflow-job",
+        message: `reusable target "${path}" is outside .github/workflows`,
+      });
+      continue;
+    }
+    if (!ctx.provider) {
+      job.unsupported.push({
+        kind: "reusable-workflow-job",
+        message: `local reusable workflow "${path}" not resolved (no file provider)`,
+      });
+      continue;
+    }
+    if (ctx.visiting.has(path)) {
+      call.resolutionError = "cycle";
+      job.unsupported.push({
+        kind: "reusable-cycle",
+        message: `reusable-workflow cycle detected at "${path}"`,
+      });
+      continue;
+    }
+    if (ctx.depth + 1 > MAX_REUSABLE_DEPTH) {
+      call.resolutionError = "depth";
+      job.unsupported.push({
+        kind: "reusable-depth",
+        message: `reusable-workflow nesting exceeds ${MAX_REUSABLE_DEPTH}`,
+      });
+      continue;
+    }
+
+    if (ctx.memo.has(path)) {
+      const cached = ctx.memo.get(path);
+      if (cached) {
+        call.resolved = cached;
+      } else {
+        call.resolutionError = "unresolved";
+        job.unsupported.push({
+          kind: "reusable-missing",
+          message: `local reusable workflow "${path}" could not be resolved`,
+        });
+      }
+      continue;
+    }
+
+    const content = ctx.provider.read(path);
+    if (content === undefined) {
+      ctx.memo.set(path, null);
+      call.resolutionError = "missing";
+      job.unsupported.push({
+        kind: "reusable-missing",
+        message: `local reusable workflow "${path}" was not found`,
+      });
+      continue;
+    }
+
+    const result = await normalizeTree(
+      { filename: path, content },
+      {
+        provider: ctx.provider,
+        depth: ctx.depth + 1,
+        visiting: new Set([...ctx.visiting, path]),
+        memo: ctx.memo,
+      },
+    );
+    if (result.model) {
+      ctx.memo.set(path, result.model);
+      call.resolved = result.model; // resolved local call is supported
+    } else {
+      ctx.memo.set(path, null);
+      call.resolutionError = "parse";
+      job.unsupported.push({
+        kind: "reusable-workflow-job",
+        message: `local reusable workflow "${path}" could not be parsed`,
+      });
+    }
+  }
+}
+
+/** A local reusable target must stay within `.github/workflows` (no traversal). */
+function isSafeLocalPath(path: string): boolean {
+  return (
+    path.startsWith(".github/workflows/") &&
+    !path.includes("..") &&
+    (path.endsWith(".yml") || path.endsWith(".yaml"))
+  );
+}
+
+/** Parse a reusable-workflow call from the raw job mapping (`uses`/`with`/`secrets`). */
+function buildReusableCall(
+  rawJob: MappingToken,
+): ReusableWorkflowCall | undefined {
+  const usesToken = findKey(rawJob, "uses");
+  if (!usesToken || !isString(usesToken)) {
+    return undefined;
+  }
+  const uses = usesToken.value;
+  const target: ReusableTarget = uses.startsWith("./")
+    ? { kind: "local", path: uses.slice(2) }
+    : { kind: "external", raw: uses };
+
+  const withValues: Record<string, string | number | boolean> = {};
+  const unresolvedInputs: string[] = [];
+  const withToken = findKey(rawJob, "with");
+  if (withToken && isMapping(withToken)) {
+    for (const pair of withToken) {
+      const name = pair.key.toString();
+      const literal = readScalar(pair.value);
+      if (literal === null) {
+        unresolvedInputs.push(name);
+      } else {
+        withValues[name] = literal;
+      }
+    }
+  }
+
+  let secrets: ReusableWorkflowCall["secrets"] = { names: [] };
+  const secretsToken = findKey(rawJob, "secrets");
+  if (secretsToken) {
+    if (isString(secretsToken) && secretsToken.value === "inherit") {
+      secrets = "inherit";
+    } else if (isMapping(secretsToken)) {
+      const names: string[] = [];
+      for (const pair of secretsToken) {
+        names.push(pair.key.toString());
+      }
+      secrets = { names };
+    }
+  }
+
+  return { target, with: withValues, unresolvedInputs, secrets };
 }
 
 /**

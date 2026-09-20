@@ -22,25 +22,28 @@ set of scenarios, evaluates each, and collapses them into distinct execution
 plans (`ciproof paths`). Neither checks invariants or searches for
 counterexamples — that is Phase 4+.
 
-| Construct                                                             | Parse | Normalize                                     | Evaluate-one                                    | Explore-many                                  |
-| --------------------------------------------------------------------- | ----- | --------------------------------------------- | ----------------------------------------------- | --------------------------------------------- |
-| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                                           | yes (event-specific context)                    | yes (only declared events generated)          |
-| `branches` / `branches-ignore`                                        | yes   | yes (patterns + order)                        | yes (filter-pattern globbing)                   | yes (verified witnesses + a non-match class)  |
-| `paths` / `paths-ignore`                                              | yes   | yes (patterns + order)                        | yes over explicit changed files                 | yes (matching / non-matching / mixed / empty) |
-| `workflow_dispatch` `boolean`                                         | yes   | yes                                           | yes (booleans stay booleans)                    | yes (enumerates `false`, `true`)              |
-| `workflow_dispatch` `choice`                                          | yes   | yes                                           | yes                                             | yes (enumerates declared options)             |
-| `workflow_dispatch` `string` / `number` / `environment`               | yes   | represented (unsupported)                     | UNKNOWN when it affects a result                | partial (left unset; limitation recorded)     |
-| `jobs.<id>.if`                                                        | yes   | yes                                           | yes (three-valued; implicit `success()`)        | yes                                           |
-| `success()` / `always()`                                              | yes   | n/a                                           | yes (from modeled needs state)                  | yes                                           |
-| `failure()` / `cancelled()`                                           | yes   | n/a                                           | UNKNOWN (runtime state not modeled)             | UNKNOWN plan preserved; partial               |
-| `needs` (string or list) + DAG                                        | yes   | yes (diagnostics)                             | yes (success/skipped abstraction)               | yes                                           |
-| `permissions`                                                         | yes   | yes (explicit / unspecified)                  | not yet (no effective-token computation)        | not yet                                       |
-| `schedule`                                                            | yes   | yes (cron entries)                            | yes (default-branch ctx; github.event.schedule) | yes (one scenario per declared cron)          |
-| `workflow_run`                                                        | yes   | yes (names/types/branches)                    | yes (name/activity/branch; conclusion)          | yes (name × activity × branch × conclusion)   |
-| static matrix (literal values)                                        | yes   | yes (dimensions/include/exclude/combinations) | supported at job level (see abstraction)        | yes (no per-instance explosion)               |
-| dynamic matrix (`fromJSON` / needs output)                            | yes   | unsupported (dynamic)                         | UNKNOWN when relevant                           | limitation → partial                          |
-| `push` tag filters (`tags` / `tags-ignore`)                           | yes   | limitation (tag refs unmodeled)               | UNKNOWN when relevant                           | limitation → partial                          |
-| reusable workflows / dynamic outputs / `concurrency`                  | yes   | unsupported marker                            | UNKNOWN when relevant                           | not generated; limitation → partial           |
+| Construct                                                             | Parse | Normalize                                      | Evaluate-one                                     | Explore-many                                     |
+| --------------------------------------------------------------------- | ----- | ---------------------------------------------- | ------------------------------------------------ | ------------------------------------------------ |
+| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                                            | yes (event-specific context)                     | yes (only declared events generated)             |
+| `branches` / `branches-ignore`                                        | yes   | yes (patterns + order)                         | yes (filter-pattern globbing)                    | yes (verified witnesses + a non-match class)     |
+| `paths` / `paths-ignore`                                              | yes   | yes (patterns + order)                         | yes over explicit changed files                  | yes (matching / non-matching / mixed / empty)    |
+| `workflow_dispatch` `boolean`                                         | yes   | yes                                            | yes (booleans stay booleans)                     | yes (enumerates `false`, `true`)                 |
+| `workflow_dispatch` `choice`                                          | yes   | yes                                            | yes                                              | yes (enumerates declared options)                |
+| `workflow_dispatch` `string` / `number` / `environment`               | yes   | represented (unsupported)                      | UNKNOWN when it affects a result                 | partial (left unset; limitation recorded)        |
+| `jobs.<id>.if`                                                        | yes   | yes                                            | yes (three-valued; implicit `success()`)         | yes                                              |
+| `success()` / `always()`                                              | yes   | n/a                                            | yes (from modeled needs state)                   | yes                                              |
+| `failure()` / `cancelled()`                                           | yes   | n/a                                            | UNKNOWN (runtime state not modeled)              | UNKNOWN plan preserved; partial                  |
+| `needs` (string or list) + DAG                                        | yes   | yes (diagnostics)                              | yes (success/skipped abstraction)                | yes                                              |
+| `permissions`                                                         | yes   | yes (explicit / unspecified)                   | not yet (no effective-token computation)         | not yet                                          |
+| `schedule`                                                            | yes   | yes (cron entries)                             | yes (default-branch ctx; github.event.schedule)  | yes (one scenario per declared cron)             |
+| `workflow_run`                                                        | yes   | yes (names/types/branches)                     | yes (name/activity/branch; conclusion)           | yes (name × activity × branch × conclusion)      |
+| static matrix (literal values)                                        | yes   | yes (dimensions/include/exclude/combinations)  | supported at job level (see abstraction)         | yes (no per-instance explosion)                  |
+| dynamic matrix (`fromJSON` / needs output)                            | yes   | unsupported (dynamic)                          | UNKNOWN when relevant                            | limitation → partial                             |
+| `push` tag filters (`tags` / `tags-ignore`)                           | yes   | yes (patterns + order; branch/tag ref kinds)   | yes (tag vs branch ref; tags ignore path filter) | yes (branch + tag scenarios, verified witnesses) |
+| local reusable workflows (`uses: ./…`)                                | yes   | yes (resolved; input/secret/permission flow)   | yes (called jobs evaluated in caller context)    | yes (through the resolved called workflow)       |
+| external reusable workflows (`uses: owner/repo/…@ref`)                | yes   | represented (not fetched)                      | UNKNOWN when relevant                            | limitation → partial                             |
+| `concurrency`                                                         | yes   | yes (informational; not reachability-blocking) | reachability unaffected (surfaced as a note)     | reachability unaffected (informational note)     |
+| dynamic outputs                                                       | yes   | unsupported marker                             | UNKNOWN when relevant                            | not generated; limitation → partial              |
 
 ### Matrix abstraction
 
@@ -58,6 +61,57 @@ UNKNOWN.
 upstream run's privilege. CIProof does **not** model cross-workflow trust
 provenance, so it does **not** turn `workflow_run` into a CP003 violation; such
 paths remain UNKNOWN pending provenance modeling.
+
+### Push tag refs
+
+A `push` can carry a branch ref (`refs/heads/…`) or a tag ref (`refs/tags/…`).
+CIProof models both ref kinds and the GitHub rules that distinguish them:
+
+- `tags` / `tags-ignore` match only tag pushes; `branches` / `branches-ignore`
+  match only branch pushes; declaring one kind's filter excludes the other kind
+  entirely (a `tags`-only workflow never runs on a branch push, and vice versa).
+- **Tag pushes ignore `paths` / `paths-ignore` filters** (GitHub applies path
+  filters to branch pushes only). A release job gated on a tag push is therefore
+  correctly reachable even when the workflow also declares path filters.
+- Ordered positive/negative patterns are preserved (last-match-wins), and each
+  synthesized tag witness is verified through the real matcher.
+
+Exploration generates both a branch scenario and a tag scenario for a `push`
+that can produce each, so tag-only reachability (e.g. `release` on `v*`) is a
+first-class explored path rather than a limitation.
+
+### Concurrency (structural vs runtime)
+
+`concurrency` controls how runs are **queued and cancelled**; it never changes
+which jobs are structurally reachable **within** a run. CIProof therefore treats
+`concurrency` as **informational**: it is surfaced as a note ("does not affect
+reachability") but does **not** make analysis `partial`. A workflow whose only
+unmodeled construct is `concurrency` is `complete-within-supported-model`.
+CIProof does not model run cancellation or queue ordering, and says so.
+
+### Local reusable workflows
+
+A same-repository reusable call (`uses: ./.github/workflows/x.yml`) is
+**resolved**: the called workflow is parsed and normalized, and its jobs are
+evaluated in the caller's context. CIProof models the caller→called flow:
+
+- `with:` inputs and `secrets` (`inherit` or an explicit set) are captured;
+- **permissions cannot be elevated through a call** — the effective privilege of
+  a called job is `min(caller, called)`, so a caller that grants only `read`
+  cannot make a called `write` job privileged;
+- **CP003 traces through the call**: an external `pull_request_target` reaching a
+  privileged job **inside** a resolved local reusable workflow is reported as a
+  `violated` path that names the called job and the call site (not just the
+  caller). An unspecified caller grant or an ordinary fork `pull_request` yields
+  `unknown`, consistent with the top-level CP003 conservatism.
+
+Resolution is bounded (max nesting depth) and detects **cycles** (a call chain
+returning to a workflow already on the stack) and **missing** targets; both are
+surfaced as limitations rather than crashing or asserting certainty. Unsafe
+paths (outside `.github/workflows/`, containing `..`, or non-YAML) are refused.
+
+**External** reusable workflows (`uses: owner/repo/…@ref`) are represented but
+**not fetched** (no network); they remain a limitation → `partial`.
 
 ### Phase 3 exploration assumptions
 
@@ -148,21 +202,20 @@ These constructs are **out of v0.1 scope**. When they are relevant to a result,
 CIProof must return `UNKNOWN` (or otherwise refuse to assert certainty), never a
 confident "safe".
 
-| Construct                     | Reason deferred                          | Fixture                                           |
-| ----------------------------- | ---------------------------------------- | ------------------------------------------------- |
-| `workflow_run`                | Cross-workflow triggering not modeled    | `test/fixtures/unsupported/workflow-run.yml`      |
-| `schedule`                    | Time-based triggering not modeled        | `test/fixtures/unsupported/schedule.yml`          |
-| `repository_dispatch`         | External API triggering not modeled      | —                                                 |
-| `merge_group`                 | Merge-queue semantics not modeled        | —                                                 |
-| Reusable workflow semantics   | Input/secret/permission flow not modeled | `test/fixtures/unsupported/reusable-workflow.yml` |
-| Dynamic job outputs           | Runtime-produced values are unknowable   | `test/fixtures/unsupported/dynamic-output.yml`    |
-| Complex matrix semantics      | Job multiplicity not modeled             | `test/fixtures/unsupported/matrix-complex.yml`    |
-| `concurrency`                 | Cancellation/queueing not modeled        | —                                                 |
-| Full environment protection   | Reviewers/wait timers not modeled        | —                                                 |
-| Organization Actions policies | Not read in v0.1 (see Phase 9)           | —                                                 |
-| Enterprise Actions policies   | Not read in v0.1 (see Phase 9)           | —                                                 |
-| Shell-step semantics          | CIProof never executes shell             | —                                                 |
-| Container execution           | CIProof never executes containers        | —                                                 |
+| Construct                     | Reason deferred                                                                 | Fixture                                           |
+| ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `workflow_run`                | Cross-workflow triggering not modeled                                           | `test/fixtures/unsupported/workflow-run.yml`      |
+| `schedule`                    | Time-based triggering not modeled                                               | `test/fixtures/unsupported/schedule.yml`          |
+| `repository_dispatch`         | External API triggering not modeled                                             | —                                                 |
+| `merge_group`                 | Merge-queue semantics not modeled                                               | —                                                 |
+| External reusable workflows   | Not fetched in v0.1 (no network); local calls are resolved                      | `test/fixtures/unsupported/reusable-workflow.yml` |
+| Dynamic job outputs           | Runtime-produced values are unknowable                                          | `test/fixtures/unsupported/dynamic-output.yml`    |
+| Dynamic matrix semantics      | `fromJSON` / needs-output multiplicity not modeled (static matrix is supported) | `test/fixtures/unsupported/matrix-complex.yml`    |
+| Full environment protection   | Reviewers/wait timers not modeled                                               | —                                                 |
+| Organization Actions policies | Not read in v0.1 (see Phase 9)                                                  | —                                                 |
+| Enterprise Actions policies   | Not read in v0.1 (see Phase 9)                                                  | —                                                 |
+| Shell-step semantics          | CIProof never executes shell                                                    | —                                                 |
+| Container execution           | CIProof never executes containers                                               | —                                                 |
 
 ---
 
