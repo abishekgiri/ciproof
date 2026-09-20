@@ -14,34 +14,50 @@ reference the compatibility suite checks against.
 
 ---
 
-## Implementation status (parse / normalize / evaluate)
+## Implementation status (parse / normalize / evaluate-one / explore-many)
 
-Three distinct levels, so no user mistakes one for another. **Evaluate** means
-CIProof can compute a construct's effect for **one explicit scenario**
-(`ciproof explain`). It does **not** yet mean multi-scenario exploration,
-invariants, or counterexamples — those are Phase 3+.
+Four distinct levels, so no user mistakes one for another. **Evaluate-one** is a
+single explicit scenario (`ciproof explain`). **Explore-many** derives a finite
+set of scenarios, evaluates each, and collapses them into distinct execution
+plans (`ciproof paths`). Neither checks invariants or searches for
+counterexamples — that is Phase 4+.
 
-| Construct                                                             | Parse | Normalize                                           | Evaluate (one scenario)                                       |
-| --------------------------------------------------------------------- | ----- | --------------------------------------------------- | ------------------------------------------------------------- |
-| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                                                 | yes (event-specific context; distinct `github.ref`/base/head) |
-| `branches` / `branches-ignore`                                        | yes   | yes (patterns + order)                              | yes (GitHub filter-pattern globbing)                          |
-| `paths` / `paths-ignore`                                              | yes   | yes (patterns + order)                              | yes over explicit changed files; UNKNOWN if none supplied     |
-| `workflow_dispatch` `boolean` / `choice` inputs                       | yes   | yes                                                 | yes (booleans stay booleans; unsupplied+no-default = UNKNOWN) |
-| `jobs.<id>.if`                                                        | yes   | yes (raw text + parse state + references)           | yes (three-valued; implicit `success()` modeled)              |
-| `success()` / `always()`                                              | yes   | n/a                                                 | yes (from modeled needs state)                                |
-| `failure()` / `cancelled()`                                           | yes   | n/a                                                 | UNKNOWN (runtime state not modeled)                           |
-| `needs` (string or list) + DAG                                        | yes   | yes (order; unknown/self/cycle diagnostics)         | yes (success/skipped propagation abstraction)                 |
-| `permissions`                                                         | yes   | yes (explicit / unspecified / read-all / write-all) | not yet (no effective-token computation)                      |
-| `schedule` / `workflow_run` / matrix / reusable / dynamic outputs     | yes   | unsupported marker                                  | UNKNOWN when relevant                                         |
+| Construct                                                             | Parse | Normalize                    | Evaluate-one                             | Explore-many                                  |
+| --------------------------------------------------------------------- | ----- | ---------------------------- | ---------------------------------------- | --------------------------------------------- |
+| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                          | yes (event-specific context)             | yes (only declared events generated)          |
+| `branches` / `branches-ignore`                                        | yes   | yes (patterns + order)       | yes (filter-pattern globbing)            | yes (verified witnesses + a non-match class)  |
+| `paths` / `paths-ignore`                                              | yes   | yes (patterns + order)       | yes over explicit changed files          | yes (matching / non-matching / mixed / empty) |
+| `workflow_dispatch` `boolean`                                         | yes   | yes                          | yes (booleans stay booleans)             | yes (enumerates `false`, `true`)              |
+| `workflow_dispatch` `choice`                                          | yes   | yes                          | yes                                      | yes (enumerates declared options)             |
+| `workflow_dispatch` `string` / `number` / `environment`               | yes   | represented (unsupported)    | UNKNOWN when it affects a result         | partial (left unset; limitation recorded)     |
+| `jobs.<id>.if`                                                        | yes   | yes                          | yes (three-valued; implicit `success()`) | yes                                           |
+| `success()` / `always()`                                              | yes   | n/a                          | yes (from modeled needs state)           | yes                                           |
+| `failure()` / `cancelled()`                                           | yes   | n/a                          | UNKNOWN (runtime state not modeled)      | UNKNOWN plan preserved; partial               |
+| `needs` (string or list) + DAG                                        | yes   | yes (diagnostics)            | yes (success/skipped abstraction)        | yes                                           |
+| `permissions`                                                         | yes   | yes (explicit / unspecified) | not yet (no effective-token computation) | not yet                                       |
+| `schedule` / `workflow_run` / matrix / reusable / dynamic outputs     | yes   | unsupported marker           | UNKNOWN when relevant                    | not generated; limitation → partial           |
 
-### Phase 2 evaluation assumptions
+### Phase 3 exploration assumptions
+
+- **Equivalence classes, not enumeration.** Branch/path domains are finite
+  representatives derived from the patterns the workflow references (plus a
+  non-matching class), each synthesized witness verified through the real
+  matcher. Ordered positive/negative patterns are preserved (last-match-wins).
+- **Bounded.** Exploration caps at `--max-scenarios` (default 10,000). Hitting
+  the cap sets `truncated` and prints a loud "Results are partial." message —
+  never "all paths checked."
+- **Completeness.** `complete-within-supported-model` requires no truncation, no
+  limitations, and no UNKNOWN plans; otherwise `partial`. It never claims
+  mathematical completeness beyond the supported abstraction.
+- **UNKNOWN plans are kept**, not discarded — a distinct plan whose outcome
+  depends on unmodeled semantics is legitimate and reported.
+- **No invariants, no counterexamples, no safety claims.** `ciproof paths`
+  discovers execution plans only.
+
+### Phase 2 evaluation assumptions (unchanged)
 
 - **No execution.** A `run` result means "GitHub would schedule this job", not
-  "the job succeeded". For dependency flow, a scheduled job is treated as
-  succeeded; step-level failures and cancellation are not modeled — hence
-  `failure()`/`cancelled()`/`!cancelled()` evaluate to `unknown`.
-- **One scenario only.** No scenario generation, deduplication, invariants, or
-  counterexamples.
+  "the job succeeded"; step-level failures and cancellation are not modeled.
 - **Conservative UNKNOWN.** Any unmodeled context field, unknown input, or
   unmodeled function makes the affected result `unknown`, never a guess.
 

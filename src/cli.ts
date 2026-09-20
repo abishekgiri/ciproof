@@ -1,15 +1,16 @@
 /**
  * CIProof command-line entry point.
  *
- * Phase 1 exposes exactly one product command, `inspect`, which prints the
- * normalized model of the workflows it discovers. No behavioral analysis
- * (check / paths / explain) exists yet — those arrive in later phases.
+ * Commands: `inspect` (normalized model), `explain` (evaluate one concrete
+ * scenario), and `paths` (explore the modeled scenario space into distinct
+ * execution plans). Invariant checking / counterexamples are a later phase.
  */
 
 import { Command } from "commander";
 import pkg from "../package.json" with { type: "json" };
 import { runInspect } from "./inspect.js";
 import { runExplain } from "./explain.js";
+import { runPaths } from "./paths.js";
 import type { SupportedTriggerEvent } from "./model/index.js";
 
 export function buildProgram(): Command {
@@ -38,6 +39,45 @@ export function buildProgram(): Command {
       process.stdout.write(output.endsWith("\n") ? output : `${output}\n`);
       process.exitCode = exitCode;
     });
+
+  program
+    .command("paths")
+    .description(
+      "explore the modeled scenario space and list distinct execution plans",
+    )
+    .option("-C, --dir <path>", "repository root to inspect", process.cwd())
+    .option(
+      "--workflow <file>",
+      "restrict to workflows whose path contains this",
+    )
+    .option(
+      "--max-scenarios <n>",
+      "maximum scenarios to evaluate before truncating",
+      (value) => Number.parseInt(value, 10),
+    )
+    .option("--json", "emit the exploration as JSON", false)
+    .action(
+      async (options: {
+        dir: string;
+        workflow?: string;
+        maxScenarios?: number;
+        json: boolean;
+      }) => {
+        const { output, exitCode } = await runPaths({
+          root: options.dir,
+          ...(options.workflow !== undefined
+            ? { workflow: options.workflow }
+            : {}),
+          ...(options.maxScenarios !== undefined &&
+          !Number.isNaN(options.maxScenarios)
+            ? { maxScenarios: options.maxScenarios }
+            : {}),
+          json: options.json,
+        });
+        process.stdout.write(output.endsWith("\n") ? output : `${output}\n`);
+        process.exitCode = exitCode;
+      },
+    );
 
   const supportedEvents: SupportedTriggerEvent[] = [
     "push",

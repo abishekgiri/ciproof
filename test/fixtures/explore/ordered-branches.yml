@@ -1,0 +1,15 @@
+# Purpose: ordered positive/negative/positive branch patterns. The same branch
+# can move include -> exclude -> include depending on order, so the matcher must
+# honor last-match-wins and the explorer must not reduce ordered filters to a set.
+name: ordered-branches
+on:
+  push:
+    branches:
+      - "releases/**"
+      - "!releases/**-alpha"
+      - "releases/special-alpha"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

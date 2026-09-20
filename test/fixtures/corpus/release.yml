@@ -1,0 +1,24 @@
+# Representative sample (not scraped): a manual release workflow with a choice
+# environment and a boolean dry-run gate. Exercises choice x boolean input
+# exploration and a condition referencing an input. Never executed.
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [staging, production]
+      dry_run:
+        type: boolean
+        default: true
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo plan
+  apply:
+    needs: plan
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo apply
