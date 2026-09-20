@@ -7,6 +7,7 @@
  */
 
 import type { JobModel } from "./job.js";
+import type { PermissionModel } from "./permissions.js";
 import type { SourceLocation } from "./source.js";
 import type { TriggerModel } from "./trigger.js";
 
@@ -29,6 +30,8 @@ export interface WorkflowModel {
   name?: string;
   /** Supported triggers, in declared order. */
   triggers: TriggerModel[];
+  /** Workflow-level `permissions` (the default for jobs that declare none). */
+  permissions: PermissionModel;
   /** Jobs keyed by job id, preserving declared iteration order. */
   jobs: Map<string, JobModel>;
   source?: SourceLocation;

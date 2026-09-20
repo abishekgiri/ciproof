@@ -1,0 +1,10 @@
+# Purpose: pull_request_target reaching a read-only job -> no CP003 violation.
+name: prt-readonly
+on: pull_request_target
+jobs:
+  label:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo label

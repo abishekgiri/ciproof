@@ -1,0 +1,10 @@
+# Purpose: workflow-level write-all inherited by a job with no job-level
+# permissions, reached by pull_request_target -> CP003 violation (workflow-level).
+name: workflow-write-all
+on: pull_request_target
+permissions: write-all
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo placeholder

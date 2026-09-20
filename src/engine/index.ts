@@ -29,6 +29,7 @@ export {
   exploreWorkflow,
   type ExplorationResult,
   type ExecutionPlan,
+  type ScenarioOutcome,
   type Completeness,
 } from "./explorer.js";
 export {

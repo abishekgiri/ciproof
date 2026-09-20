@@ -1,0 +1,15 @@
+# Purpose: a job whose condition can never hold for the only declared event.
+# On pull_request, github.event_name is always 'pull_request', so `never` never
+# runs -> CP001 unreachable (exploration is complete for this workflow).
+name: unreachable-job
+on: pull_request
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
+  never:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo never

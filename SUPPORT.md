@@ -61,6 +61,19 @@ counterexamples — that is Phase 4+.
 - **Conservative UNKNOWN.** Any unmodeled context field, unknown input, or
   unmodeled function makes the affected result `unknown`, never a guess.
 
+### Invariant checks (`ciproof check`)
+
+Checks run over exploration results and report `violated` / `not-violated` /
+`unknown`. `not-violated` means "no violation found within the modeled
+scenarios" — never "safe" or "proven". Counterexamples are always concrete,
+already-explored scenarios (never fabricated).
+
+| Check                               | What it reports                                                             | Conservatism                                                                                                                                                                                                                                                                                                                       |
+| ----------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **CP001** unreachable job           | A job no explored scenario runs.                                            | Strong (`violated`) only when exploration is complete-within-supported-model and the job has no UNKNOWN state / unsupported construct; otherwise `unknown`.                                                                                                                                                                        |
+| **CP002** prerequisite bypass       | A target job runs while an explicitly-required job did not complete.        | Requires explicit rules (`--require target:job,...`); never guesses from names. RUN is the only "completed" state; a required UNKNOWN yields `unknown`.                                                                                                                                                                            |
+| **CP003** untrusted privileged path | An external/fork context reaches a job with explicit `write` / `write-all`. | Only explicit modeled privilege counts (`unspecified` never does); effective = job-level then workflow-level. `pull_request_target` → `violated` (with a policy limitation); ordinary fork `pull_request` → `unknown` (fork-token downgrade depends on repo settings). Repository/org/enterprise Actions policies are not modeled. |
+
 ---
 
 ## Supported targets (v0.1)

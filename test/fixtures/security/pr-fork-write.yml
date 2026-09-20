@@ -1,0 +1,11 @@
+# Purpose: ordinary pull_request with explicit write. A fork run's effective
+# token depends on repository settings CIProof does not model -> CP003 UNKNOWN.
+name: pr-fork-write
+on: pull_request
+jobs:
+  publish:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo placeholder

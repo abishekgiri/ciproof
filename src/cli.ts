@@ -11,7 +11,9 @@ import pkg from "../package.json" with { type: "json" };
 import { runInspect } from "./inspect.js";
 import { runExplain } from "./explain.js";
 import { runPaths } from "./paths.js";
+import { runCheck } from "./check.js";
 import type { SupportedTriggerEvent } from "./model/index.js";
+import type { PrerequisiteRule } from "./invariants/index.js";
 
 export function buildProgram(): Command {
   const program = new Command();
@@ -71,6 +73,55 @@ export function buildProgram(): Command {
           ...(options.maxScenarios !== undefined &&
           !Number.isNaN(options.maxScenarios)
             ? { maxScenarios: options.maxScenarios }
+            : {}),
+          json: options.json,
+        });
+        process.stdout.write(output.endsWith("\n") ? output : `${output}\n`);
+        process.exitCode = exitCode;
+      },
+    );
+
+  program
+    .command("check")
+    .description(
+      "check built-in invariants (CP001/CP002/CP003) and report findings",
+    )
+    .option("-C, --dir <path>", "repository root to inspect", process.cwd())
+    .option(
+      "--workflow <file>",
+      "restrict to workflows whose path contains this",
+    )
+    .option(
+      "--max-scenarios <n>",
+      "maximum scenarios to evaluate before truncating",
+      (value) => Number.parseInt(value, 10),
+    )
+    .option(
+      "--require <target:job1,job2>",
+      "CP002 rule: target job requires the listed jobs to complete (repeatable)",
+      collectRequire,
+      [] as PrerequisiteRule[],
+    )
+    .option("--json", "emit findings as JSON", false)
+    .action(
+      async (options: {
+        dir: string;
+        workflow?: string;
+        maxScenarios?: number;
+        require: PrerequisiteRule[];
+        json: boolean;
+      }) => {
+        const { output, exitCode } = await runCheck({
+          root: options.dir,
+          ...(options.workflow !== undefined
+            ? { workflow: options.workflow }
+            : {}),
+          ...(options.maxScenarios !== undefined &&
+          !Number.isNaN(options.maxScenarios)
+            ? { maxScenarios: options.maxScenarios }
+            : {}),
+          ...(options.require.length > 0
+            ? { prerequisiteRules: options.require }
             : {}),
           json: options.json,
         });
@@ -156,6 +207,33 @@ interface ExplainCliOptions {
 
 function collect(value: string, previous: string[]): string[] {
   return [...previous, value];
+}
+
+function collectRequire(
+  value: string,
+  previous: PrerequisiteRule[],
+): PrerequisiteRule[] {
+  const sep = value.search(/[:=]/);
+  if (sep === -1) {
+    return previous; // malformed; ignored (target with no requirements)
+  }
+  const target = value.slice(0, sep).trim();
+  const required = value
+    .slice(sep + 1)
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  if (target.length === 0 || required.length === 0) {
+    return previous;
+  }
+  return [
+    ...previous,
+    {
+      name: `${target}-requires-${required.join("-")}`,
+      targetJob: target,
+      requiredCompletedJobs: required,
+    },
+  ];
 }
 
 function collectInput(
