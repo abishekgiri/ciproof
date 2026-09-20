@@ -1,0 +1,19 @@
+# Purpose: deploy gated on a runtime-produced job output.
+# UNSUPPORTED: needs.decide.outputs.go is computed by shell at runtime, so its
+# value is UNKNOWN to a static analyzer. Must NOT be treated as safe.
+name: unsupported-dynamic-output
+on: push
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.gate.outputs.go }}
+    steps:
+      - id: gate
+        run: echo "go=true" >> "$GITHUB_OUTPUT"
+  deploy:
+    needs: decide
+    if: ${{ needs.decide.outputs.go == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

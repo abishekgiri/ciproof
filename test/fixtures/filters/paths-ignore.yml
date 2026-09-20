@@ -1,0 +1,13 @@
+# Purpose: push with a paths-ignore filter.
+# Tests parsing of on.push.paths-ignore (negative changed-file class).
+name: filter-paths-ignore
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

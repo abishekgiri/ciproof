@@ -1,0 +1,9 @@
+# Purpose: simplest pull_request-triggered workflow.
+# Baseline for pull_request ref/trust semantics (github.ref = refs/pull/N/merge).
+name: pr-basic
+on: pull_request
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test

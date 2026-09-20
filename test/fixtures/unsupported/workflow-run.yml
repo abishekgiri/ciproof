@@ -1,0 +1,13 @@
+# Purpose: a workflow triggered by the completion of another workflow.
+# UNSUPPORTED: the workflow_run event is out of v0.1 scope and must surface as
+# UNKNOWN rather than being modeled.
+name: unsupported-workflow-run
+on:
+  workflow_run:
+    workflows: ["push-basic"]
+    types: [completed]
+jobs:
+  react:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo react

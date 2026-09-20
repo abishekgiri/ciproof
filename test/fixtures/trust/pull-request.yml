@@ -1,0 +1,11 @@
+# Purpose: pull_request (untrusted fork context, read-only token by default).
+# A fork PR runs here WITHOUT secrets; contrast with pull-request-target.yml.
+name: trust-pull-request
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

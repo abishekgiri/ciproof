@@ -1,0 +1,15 @@
+# Purpose: job.if keyed on a boolean workflow_dispatch input.
+# Tests the boolean-input condition shape central to the semantic spike.
+name: cond-boolean-input
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        type: boolean
+        default: false
+jobs:
+  deploy:
+    if: ${{ inputs.deploy }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

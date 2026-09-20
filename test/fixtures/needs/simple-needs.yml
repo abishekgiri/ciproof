@@ -1,0 +1,14 @@
+# Purpose: two jobs where deploy needs build (single dependency edge).
+# Tests needs-DAG parsing and multiple jobs in one workflow.
+name: simple-needs
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

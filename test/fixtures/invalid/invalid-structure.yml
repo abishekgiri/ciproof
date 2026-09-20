@@ -1,0 +1,7 @@
+# Purpose: valid YAML but invalid GitHub Actions structure.
+# 'steps' must be a sequence and 'runs-on' is required; the parser must emit
+# structural diagnostics rather than accept it.
+on: push
+jobs:
+  build:
+    steps: 5

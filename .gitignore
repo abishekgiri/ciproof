@@ -34,3 +34,6 @@ pnpm-debug.log*
 
 # Local agent guidance — private, never publish
 CLAUDE.md
+
+# Local scratch
+.scratch/

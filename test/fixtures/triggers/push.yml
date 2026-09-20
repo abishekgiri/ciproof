@@ -1,0 +1,9 @@
+# Purpose: simplest push-triggered workflow with one job.
+# Tests that a minimal valid workflow parses with zero diagnostics.
+name: push-basic
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

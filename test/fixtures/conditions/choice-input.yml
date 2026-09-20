@@ -1,0 +1,21 @@
+# Purpose: workflow_dispatch with a choice input and a string input.
+# Exercises choice-option normalization and the "unsupported input type"
+# path (string is valid GitHub but outside v0.1's enumerable input types).
+name: cond-choice-input
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+      note:
+        type: string
+        required: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

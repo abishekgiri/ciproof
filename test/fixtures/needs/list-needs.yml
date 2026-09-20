@@ -1,0 +1,18 @@
+# Purpose: a job whose needs is declared as a YAML list ([build, test]).
+# Must normalize identically to repeated string needs, preserving order.
+name: list-needs
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test
+  deploy:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

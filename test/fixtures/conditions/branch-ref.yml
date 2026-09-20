@@ -1,0 +1,10 @@
+# Purpose: job.if keyed on github.ref (branch gate).
+# Tests parsing of a ref-based condition for later branch-class evaluation.
+name: cond-branch-ref
+on: push
+jobs:
+  release:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo release

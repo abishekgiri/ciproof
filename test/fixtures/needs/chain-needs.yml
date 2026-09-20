@@ -1,0 +1,19 @@
+# Purpose: linear needs chain build -> test -> deploy.
+# Tests transitive dependency ordering for later reachability propagation.
+name: chain-needs
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

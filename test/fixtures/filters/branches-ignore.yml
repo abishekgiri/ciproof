@@ -1,0 +1,12 @@
+# Purpose: push with a branches-ignore filter.
+# Tests parsing of on.push.branches-ignore (negative branch class).
+name: filter-branches-ignore
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

@@ -1,0 +1,15 @@
+# Purpose: workflow_dispatch with a single boolean input.
+# Baseline for manual runs and boolean dispatch-input enumeration.
+name: dispatch-basic
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: Skip the test job
+        type: boolean
+        default: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test

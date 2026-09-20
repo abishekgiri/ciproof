@@ -1,0 +1,9 @@
+# Purpose: pull_request_target workflow (runs in base-repo context with secrets).
+# Baseline for the elevated-trust event used by CP003 in later phases.
+name: prt-basic
+on: pull_request_target
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo label

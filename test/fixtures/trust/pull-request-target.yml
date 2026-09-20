@@ -1,0 +1,18 @@
+# Purpose: pull_request_target reaching a write-privileged job.
+# Fork PRs trigger this in the BASE repo context with secrets; the privileged
+# path (contents: write) is exactly what CP003 must prove reachable later.
+name: trust-pull-request-target
+on: pull_request_target
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
+  publish-preview:
+    needs: build
+    permissions:
+      contents: write
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo publish

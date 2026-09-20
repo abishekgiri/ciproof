@@ -36,14 +36,14 @@ No workflow was executed. No secrets were required.
 
 Most CI tooling answers a different question than "is my workflow actually safe under every scenario?"
 
-| Tool class | The question it answers |
-|---|---|
-| `actionlint`, validators | Is this workflow syntactically valid? |
-| `act` | Can I execute this workflow locally? |
-| `zizmor`, CodeQL | Does this workflow match a known dangerous pattern? |
-| Run logs | Why did this job behave this way *after* it ran? |
-| Graph/estate tools | How are workflows, actions, and permissions connected? |
-| **CIProof** | **Is there any modeled execution context where CI behavior violates an invariant?** |
+| Tool class               | The question it answers                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------- |
+| `actionlint`, validators | Is this workflow syntactically valid?                                               |
+| `act`                    | Can I execute this workflow locally?                                                |
+| `zizmor`, CodeQL         | Does this workflow match a known dangerous pattern?                                 |
+| Run logs                 | Why did this job behave this way _after_ it ran?                                    |
+| Graph/estate tools       | How are workflows, actions, and permissions connected?                              |
+| **CIProof**              | **Is there any modeled execution context where CI behavior violates an invariant?** |
 
 CIProof is not another pattern scanner or workflow visualizer. It is a **bounded reachability engine** for GitHub Actions: it enumerates realizable execution scenarios (event × ref × fork/trust × changed files × inputs × job dependencies), evaluates what actually runs, and produces a **minimal, concrete counterexample** when an invariant can be violated.
 
@@ -62,7 +62,7 @@ A false counterexample is treated as a bug. When CIProof cannot model something 
 - **Reachability** — Which jobs can actually run, and under exactly which event/ref/fork/input combination?
 - **Invariant verification** — Assert rules like "deploy requires tests" or "forks cannot deploy" and get them checked against every modeled scenario.
 - **Concrete counterexamples** — Not "this looks risky," but the exact minimal scenario that violates your rule, with an execution trace and source evidence.
-- **Semantic behavior diff** *(planned)* — `ciproof diff origin/main...HEAD` tells you which execution paths a PR *gained or lost* — e.g. "`workflow_dispatch` can now reach `deploy-production`."
+- **Semantic behavior diff** _(planned)_ — `ciproof diff origin/main...HEAD` tells you which execution paths a PR _gained or lost_ — e.g. "`workflow_dispatch` can now reach `deploy-production`."
 
 ### Example
 
@@ -84,7 +84,7 @@ jobs:
     if: ${{ always() }}
 ```
 
-with the invariant *"whenever `deploy` runs, `test` must have completed"* — CIProof reports:
+with the invariant _"whenever `deploy` runs, `test` must have completed"_ — CIProof reports:
 
 ```
 REFUTED

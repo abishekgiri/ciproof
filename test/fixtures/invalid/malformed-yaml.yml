@@ -1,0 +1,4 @@
+# Purpose: broken YAML syntax (unterminated flow sequence).
+# The parser must report a diagnostic (with a range) and must NOT crash.
+on: push
+jobs: [this is not valid

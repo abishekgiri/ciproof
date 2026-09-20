@@ -1,0 +1,13 @@
+# Purpose: push with a paths allow-list filter.
+# Tests parsing of on.push.paths for later changed-file-class derivation.
+name: filter-paths
+on:
+  push:
+    paths:
+      - 'src/**'
+      - '**.ts'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

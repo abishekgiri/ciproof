@@ -1,0 +1,21 @@
+# Purpose: deploy needs test but uses if: always(), so it runs even when test
+# is skipped or fails. This is the canonical prerequisite-bypass shape.
+name: always-needs
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        type: boolean
+        default: false
+jobs:
+  test:
+    if: ${{ !inputs.skip_tests }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test
+  deploy:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

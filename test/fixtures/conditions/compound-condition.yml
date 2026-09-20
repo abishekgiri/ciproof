@@ -1,0 +1,10 @@
+# Purpose: compound boolean condition (&&, ||, ==).
+# Tests parsing of multi-term expressions for later three-valued evaluation.
+name: cond-compound
+on: [push, workflow_dispatch]
+jobs:
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

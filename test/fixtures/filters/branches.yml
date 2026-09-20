@@ -1,0 +1,13 @@
+# Purpose: push with a branches allow-list filter.
+# Tests parsing of on.push.branches for later branch-class derivation.
+name: filter-branches
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build

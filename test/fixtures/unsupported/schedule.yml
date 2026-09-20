@@ -1,0 +1,12 @@
+# Purpose: a cron-scheduled workflow.
+# UNSUPPORTED: the schedule event is out of v0.1 scope and must surface as
+# UNKNOWN rather than being modeled.
+name: unsupported-schedule
+on:
+  schedule:
+    - cron: '0 0 * * *'
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo nightly

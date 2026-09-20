@@ -1,0 +1,10 @@
+# Purpose: job.if keyed on github.event_name.
+# Tests parsing of an if condition that discriminates by event.
+name: cond-event-name
+on: [push, pull_request]
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

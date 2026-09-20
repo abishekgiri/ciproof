@@ -1,0 +1,11 @@
+# Purpose: a caller that delegates to a reusable workflow.
+# UNSUPPORTED: reusable-workflow semantics (inputs/secrets/permissions flow) are
+# out of v0.1 scope; the called workflow's jobs are UNKNOWN here.
+name: unsupported-reusable
+on: push
+jobs:
+  call:
+    uses: ./.github/workflows/reusable-deploy.yml
+    secrets: inherit
+    with:
+      environment: production

@@ -1,0 +1,20 @@
+# Purpose: deploy needs test, but test is gated by an if that can be false.
+# Basis for "skipped prerequisite" propagation (a needed job that skips).
+name: skipped-needs
+on:
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        type: boolean
+        default: true
+jobs:
+  test:
+    if: ${{ inputs.run_tests }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deploy

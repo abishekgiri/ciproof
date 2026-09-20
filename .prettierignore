@@ -1,0 +1,6 @@
+dist
+node_modules
+coverage
+.scratch
+test/fixtures/**/*.yml
+test/fixtures/**/*.yaml
