@@ -1,0 +1,15 @@
+# Purpose: a job gated on !cancelled(), a status function CIProof does not model
+# (cancellation is runtime state). Evaluation must yield UNKNOWN, not a guess.
+name: cond-not-cancelled
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo build
+  notify:
+    needs: build
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo notify

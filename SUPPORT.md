@@ -14,26 +14,36 @@ reference the compatibility suite checks against.
 
 ---
 
-## Phase 1 implementation status (parse / normalize vs. evaluate)
+## Implementation status (parse / normalize / evaluate)
 
-Phase 1 builds the normalized semantic model. It **represents** what a workflow
-declares; it does **not** evaluate behavior. The distinction below is
-deliberate, so no user mistakes representation for evaluation:
+Three distinct levels, so no user mistakes one for another. **Evaluate** means
+CIProof can compute a construct's effect for **one explicit scenario**
+(`ciproof explain`). It does **not** yet mean multi-scenario exploration,
+invariants, or counterexamples — those are Phase 3+.
 
-| Construct                                                             | Parse | Normalize                                             | Evaluate                                 |
-| --------------------------------------------------------------------- | ----- | ----------------------------------------------------- | ---------------------------------------- |
-| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                                                   | not yet                                  |
-| `branches` / `branches-ignore` / `paths` / `paths-ignore`             | yes   | yes (patterns + order preserved)                      | not yet (no glob matching)               |
-| `workflow_dispatch` `boolean` / `choice` inputs                       | yes   | yes                                                   | not yet                                  |
-| `jobs.<id>.if`                                                        | yes   | yes (raw text + parse state + references)             | not yet                                  |
-| `needs` (string or list)                                              | yes   | yes (order preserved)                                 | not yet (no state propagation)           |
-| `needs` DAG structure                                                 | yes   | yes (+ unknown/self/cycle diagnostics)                | not yet                                  |
-| `permissions`                                                         | yes   | yes (explicit vs. unspecified vs. read-all/write-all) | not yet (no effective-token computation) |
+| Construct                                                             | Parse | Normalize                                           | Evaluate (one scenario)                                       |
+| --------------------------------------------------------------------- | ----- | --------------------------------------------------- | ------------------------------------------------------------- |
+| `push` / `pull_request` / `pull_request_target` / `workflow_dispatch` | yes   | yes                                                 | yes (event-specific context; distinct `github.ref`/base/head) |
+| `branches` / `branches-ignore`                                        | yes   | yes (patterns + order)                              | yes (GitHub filter-pattern globbing)                          |
+| `paths` / `paths-ignore`                                              | yes   | yes (patterns + order)                              | yes over explicit changed files; UNKNOWN if none supplied     |
+| `workflow_dispatch` `boolean` / `choice` inputs                       | yes   | yes                                                 | yes (booleans stay booleans; unsupplied+no-default = UNKNOWN) |
+| `jobs.<id>.if`                                                        | yes   | yes (raw text + parse state + references)           | yes (three-valued; implicit `success()` modeled)              |
+| `success()` / `always()`                                              | yes   | n/a                                                 | yes (from modeled needs state)                                |
+| `failure()` / `cancelled()`                                           | yes   | n/a                                                 | UNKNOWN (runtime state not modeled)                           |
+| `needs` (string or list) + DAG                                        | yes   | yes (order; unknown/self/cycle diagnostics)         | yes (success/skipped propagation abstraction)                 |
+| `permissions`                                                         | yes   | yes (explicit / unspecified / read-all / write-all) | not yet (no effective-token computation)                      |
+| `schedule` / `workflow_run` / matrix / reusable / dynamic outputs     | yes   | unsupported marker                                  | UNKNOWN when relevant                                         |
 
-"Evaluate" — trigger matching, condition truth, reachability, scenario
-generation — is Phase 2 and beyond. Everything in the "Not yet supported" table
-below is neither normalized nor evaluated, and must surface as `UNKNOWN` when it
-would affect a result.
+### Phase 2 evaluation assumptions
+
+- **No execution.** A `run` result means "GitHub would schedule this job", not
+  "the job succeeded". For dependency flow, a scheduled job is treated as
+  succeeded; step-level failures and cancellation are not modeled — hence
+  `failure()`/`cancelled()`/`!cancelled()` evaluate to `unknown`.
+- **One scenario only.** No scenario generation, deduplication, invariants, or
+  counterexamples.
+- **Conservative UNKNOWN.** Any unmodeled context field, unknown input, or
+  unmodeled function makes the affected result `unknown`, never a guess.
 
 ---
 

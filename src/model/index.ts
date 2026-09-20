@@ -7,6 +7,7 @@
  */
 
 export type { SourcePosition, SourceLocation } from "./source.js";
+export { notTruth, andTruth, orTruth, type Truth } from "./truth.js";
 export {
   ModelDiagnosticCode,
   type ModelDiagnostic,
