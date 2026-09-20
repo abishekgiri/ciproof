@@ -1,0 +1,1636 @@
+{
+  "generatedAt": "2026-09-20T07:12:53.513Z",
+  "repoCount": 50,
+  "repos": [
+    {
+      "repo": "sindresorhus/got",
+      "commit": "e4cd0d3f072170e178a709bb0d1051e223f1723c",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/main.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sindresorhus__got/.github__workflows__main.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "expressjs/express",
+      "commit": "9a34acf03cb818ff3f8bc40e44176e277a25cbb9",
+      "branch": "master",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/expressjs__express/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/codeql.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/expressjs__express/.github__workflows__codeql.yml"
+        },
+        {
+          "path": ".github/workflows/legacy.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/expressjs__express/.github__workflows__legacy.yml"
+        },
+        {
+          "path": ".github/workflows/npm-publish.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/expressjs__express/.github__workflows__npm-publish.yml"
+        },
+        {
+          "path": ".github/workflows/scorecard.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/expressjs__express/.github__workflows__scorecard.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "chalk/chalk",
+      "commit": "8960ada92ca0f9220c8863495bae78dcc0c323ee",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/main.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/chalk__chalk/.github__workflows__main.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "axios/axios",
+      "commit": "56a5f1acdc41965f464eb59bec6cc828113ba546",
+      "branch": "v1.x",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/bundle-size.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__bundle-size.yml"
+        },
+        {
+          "path": ".github/workflows/lockfile-lint.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__lockfile-lint.yml"
+        },
+        {
+          "path": ".github/workflows/moderator.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__moderator.yml"
+        },
+        {
+          "path": ".github/workflows/publish.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__publish.yml"
+        },
+        {
+          "path": ".github/workflows/release-branch.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__release-branch.yml"
+        },
+        {
+          "path": ".github/workflows/run-ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__run-ci.yml"
+        },
+        {
+          "path": ".github/workflows/verify-build-reproducibility.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__verify-build-reproducibility.yml"
+        },
+        {
+          "path": ".github/workflows/zizmor.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/axios__axios/.github__workflows__zizmor.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "lodash/lodash",
+      "commit": "2b5e6f7399a7b48005140b5d5c6bc6c0e62919a8",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/browser-testing.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__browser-testing.yml"
+        },
+        {
+          "path": ".github/workflows/ci-bun.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__ci-bun.yml"
+        },
+        {
+          "path": ".github/workflows/ci-dist-sync.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__ci-dist-sync.yml"
+        },
+        {
+          "path": ".github/workflows/ci-docs.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__ci-docs.yml"
+        },
+        {
+          "path": ".github/workflows/ci-node.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__ci-node.yml"
+        },
+        {
+          "path": ".github/workflows/codeql.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__codeql.yml"
+        },
+        {
+          "path": ".github/workflows/renovate.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__renovate.yml"
+        },
+        {
+          "path": ".github/workflows/scorecards.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/lodash__lodash/.github__workflows__scorecards.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "prettier/prettier",
+      "commit": "0292df6bf356a577de0dc72e6114c8a801978552",
+      "branch": "main",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/_build.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows___build.yml"
+        },
+        {
+          "path": ".github/workflows/autofix.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows__autofix.yml"
+        },
+        {
+          "path": ".github/workflows/bundler-friendly.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows__bundler-friendly.yml"
+        },
+        {
+          "path": ".github/workflows/check-sizes.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows__check-sizes.yml"
+        },
+        {
+          "path": ".github/workflows/cleanup-cspell.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows__cleanup-cspell.yml"
+        },
+        {
+          "path": ".github/workflows/dev-package-test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows__dev-package-test.yml"
+        },
+        {
+          "path": ".github/workflows/dev-test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows__dev-test.yml"
+        },
+        {
+          "path": ".github/workflows/eslint-rules.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/prettier__prettier/.github__workflows__eslint-rules.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "eslint/eslint",
+      "commit": "3c0b7c6e1fe2dec778b97a996018126f22d437ae",
+      "branch": "main",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/docs-ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__docs-ci.yml"
+        },
+        {
+          "path": ".github/workflows/ecosystem-tests.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__ecosystem-tests.yml"
+        },
+        {
+          "path": ".github/workflows/ecosystem-updates.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__ecosystem-updates.yml"
+        },
+        {
+          "path": ".github/workflows/pr-labeler.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__pr-labeler.yml"
+        },
+        {
+          "path": ".github/workflows/rebuild-docs-sites.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__rebuild-docs-sites.yml"
+        },
+        {
+          "path": ".github/workflows/stale.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/eslint__eslint/.github__workflows__stale.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "vitejs/vite",
+      "commit": "e9078f865cdff6bed77cd729214a7e2868f126b5",
+      "branch": "main",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/bot.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__bot.yml"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__copilot-setup-steps.yml"
+        },
+        {
+          "path": ".github/workflows/ecosystem-ci-trigger.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__ecosystem-ci-trigger.yml"
+        },
+        {
+          "path": ".github/workflows/issue-close-require.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__issue-close-require.yml"
+        },
+        {
+          "path": ".github/workflows/issue-labeled.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__issue-labeled.yml"
+        },
+        {
+          "path": ".github/workflows/lock-closed-issues.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__lock-closed-issues.yml"
+        },
+        {
+          "path": ".github/workflows/prepare-release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/vitejs__vite/.github__workflows__prepare-release.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "date-fns/date-fns",
+      "commit": "18cbd436f1428d0f45f89f710df65f62546c42f0",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/browser_tests.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/date-fns__date-fns/.github__workflows__browser_tests.yaml"
+        },
+        {
+          "path": ".github/workflows/code_quality.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/date-fns__date-fns/.github__workflows__code_quality.yaml"
+        },
+        {
+          "path": ".github/workflows/coverage.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/date-fns__date-fns/.github__workflows__coverage.yaml"
+        },
+        {
+          "path": ".github/workflows/node_tests.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/date-fns__date-fns/.github__workflows__node_tests.yaml"
+        },
+        {
+          "path": ".github/workflows/smoke_tests.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/date-fns__date-fns/.github__workflows__smoke_tests.yaml"
+        },
+        {
+          "path": ".github/workflows/tz_tests.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/date-fns__date-fns/.github__workflows__tz_tests.yaml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "colinhacks/zod",
+      "commit": "0cd3af5e9f50ad11bbcd4407a46a21b8848ba574",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/claude-code-review.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__claude-code-review.yml"
+        },
+        {
+          "path": ".github/workflows/claude.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__claude.yml"
+        },
+        {
+          "path": ".github/workflows/iso-4217.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__iso-4217.yml"
+        },
+        {
+          "path": ".github/workflows/lockstep.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__lockstep.yml"
+        },
+        {
+          "path": ".github/workflows/pullfrog.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__pullfrog.yml"
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__release.yml"
+        },
+        {
+          "path": ".github/workflows/stale.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__stale.yml"
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/colinhacks__zod/.github__workflows__test.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "psf/requests",
+      "commit": "dae7ef63b4df6eded86637f251fc4e3a06c3b479",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/close-issues.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__close-issues.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/lint.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__lint.yml"
+        },
+        {
+          "path": ".github/workflows/lock-issues.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__lock-issues.yml"
+        },
+        {
+          "path": ".github/workflows/publish.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__publish.yml"
+        },
+        {
+          "path": ".github/workflows/run-tests.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__run-tests.yml"
+        },
+        {
+          "path": ".github/workflows/typecheck.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__typecheck.yml"
+        },
+        {
+          "path": ".github/workflows/zizmor.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__requests/.github__workflows__zizmor.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "pallets/flask",
+      "commit": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+      "branch": "main",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/lock.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pallets__flask/.github__workflows__lock.yaml"
+        },
+        {
+          "path": ".github/workflows/pre-commit.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pallets__flask/.github__workflows__pre-commit.yaml"
+        },
+        {
+          "path": ".github/workflows/publish.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pallets__flask/.github__workflows__publish.yaml"
+        },
+        {
+          "path": ".github/workflows/tests.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pallets__flask/.github__workflows__tests.yaml"
+        },
+        {
+          "path": ".github/workflows/zizmor.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pallets__flask/.github__workflows__zizmor.yaml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "pytest-dev/pytest",
+      "commit": "6a0de9be56365e75ff30d75cee9654739ca95f97",
+      "branch": "main",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/deploy.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pytest-dev__pytest/.github__workflows__deploy.yml"
+        },
+        {
+          "path": ".github/workflows/doc-check-links.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pytest-dev__pytest/.github__workflows__doc-check-links.yml"
+        },
+        {
+          "path": ".github/workflows/prepare-release-pr.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pytest-dev__pytest/.github__workflows__prepare-release-pr.yml"
+        },
+        {
+          "path": ".github/workflows/stale.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pytest-dev__pytest/.github__workflows__stale.yml"
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pytest-dev__pytest/.github__workflows__test.yml"
+        },
+        {
+          "path": ".github/workflows/update-plugin-list.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pytest-dev__pytest/.github__workflows__update-plugin-list.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "tiangolo/fastapi",
+      "commit": "50113da16fec53b66b80d75e80a89296de4fa5a5",
+      "branch": "master",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/add-to-project.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__add-to-project.yml"
+        },
+        {
+          "path": ".github/workflows/build-docs.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__build-docs.yml"
+        },
+        {
+          "path": ".github/workflows/bump-pre-commit-hooks.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__bump-pre-commit-hooks.yml"
+        },
+        {
+          "path": ".github/workflows/create-draft-release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__create-draft-release.yml"
+        },
+        {
+          "path": ".github/workflows/deploy-docs.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__deploy-docs.yml"
+        },
+        {
+          "path": ".github/workflows/detect-conflicts.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__detect-conflicts.yml"
+        },
+        {
+          "path": ".github/workflows/guard-dependencies.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__guard-dependencies.yml"
+        },
+        {
+          "path": ".github/workflows/issue-manager.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tiangolo__fastapi/.github__workflows__issue-manager.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "psf/black",
+      "commit": "acd6198877ced2d8126b9b3958bb17f4a65ef0d1",
+      "branch": "main",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/changelog.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__changelog.yml"
+        },
+        {
+          "path": ".github/workflows/diff_shades.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__diff_shades.yml"
+        },
+        {
+          "path": ".github/workflows/diff_shades_comment.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__diff_shades_comment.yml"
+        },
+        {
+          "path": ".github/workflows/docker.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__docker.yml"
+        },
+        {
+          "path": ".github/workflows/docs.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__docs.yml"
+        },
+        {
+          "path": ".github/workflows/fuzz.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__fuzz.yml"
+        },
+        {
+          "path": ".github/workflows/lint.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__lint.yml"
+        },
+        {
+          "path": ".github/workflows/post_release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/psf__black/.github__workflows__post_release.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "encode/httpx",
+      "commit": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+      "branch": "master",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/publish.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/encode__httpx/.github__workflows__publish.yml"
+        },
+        {
+          "path": ".github/workflows/test-suite.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/encode__httpx/.github__workflows__test-suite.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "python-poetry/poetry",
+      "commit": "f8408cab10a99ad81e4e16a0f2fda9593f5f089f",
+      "branch": "main",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/.tests-matrix.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/python-poetry__poetry/.github__workflows__.tests-matrix.yaml"
+        },
+        {
+          "path": ".github/workflows/backport.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/python-poetry__poetry/.github__workflows__backport.yaml"
+        },
+        {
+          "path": ".github/workflows/docs.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/python-poetry__poetry/.github__workflows__docs.yaml"
+        },
+        {
+          "path": ".github/workflows/lock-threads.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/python-poetry__poetry/.github__workflows__lock-threads.yaml"
+        },
+        {
+          "path": ".github/workflows/release.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/python-poetry__poetry/.github__workflows__release.yaml"
+        },
+        {
+          "path": ".github/workflows/tests.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/python-poetry__poetry/.github__workflows__tests.yaml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "commit": "915896d163835a57fd7987180087409a3229bd71",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/codspeed.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__codspeed.yml"
+        },
+        {
+          "path": ".github/workflows/coverage.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__coverage.yml"
+        },
+        {
+          "path": ".github/workflows/dependencies-check.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__dependencies-check.yml"
+        },
+        {
+          "path": ".github/workflows/docs-update.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__docs-update.yml"
+        },
+        {
+          "path": ".github/workflows/enforce-issue-assignment.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__enforce-issue-assignment.yml"
+        },
+        {
+          "path": ".github/workflows/integration.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__integration.yml"
+        },
+        {
+          "path": ".github/workflows/third-party.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/pydantic__pydantic/.github__workflows__third-party.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "gin-gonic/gin",
+      "commit": "3b08cd7235bd5ad2f055aa9e38135f111f6c5926",
+      "branch": "master",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/codeql.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gin-gonic__gin/.github__workflows__codeql.yml"
+        },
+        {
+          "path": ".github/workflows/gin.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gin-gonic__gin/.github__workflows__gin.yml"
+        },
+        {
+          "path": ".github/workflows/goreleaser.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gin-gonic__gin/.github__workflows__goreleaser.yml"
+        },
+        {
+          "path": ".github/workflows/trivy-scan.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gin-gonic__gin/.github__workflows__trivy-scan.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "spf13/cobra",
+      "commit": "adbc8813901bba65827259daa8e22ff94ec1f30e",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/labeler.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/spf13__cobra/.github__workflows__labeler.yml"
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/spf13__cobra/.github__workflows__test.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "junegunn/fzf",
+      "commit": "b1be3a8be1b833ce5b92fbbac11637643d60a046",
+      "branch": "master",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/depsreview.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__depsreview.yaml"
+        },
+        {
+          "path": ".github/workflows/labeler.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__labeler.yml"
+        },
+        {
+          "path": ".github/workflows/linux.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__linux.yml"
+        },
+        {
+          "path": ".github/workflows/macos.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__macos.yml"
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__release.yml"
+        },
+        {
+          "path": ".github/workflows/typos.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__typos.yml"
+        },
+        {
+          "path": ".github/workflows/winget.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junegunn__fzf/.github__workflows__winget.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "cli/cli",
+      "commit": "0cf1092493af067646fc5f3db9421c6a6ec9c938",
+      "branch": "trunk",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/acceptance.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__acceptance.yml"
+        },
+        {
+          "path": ".github/workflows/agentics-maintenance.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__agentics-maintenance.yml"
+        },
+        {
+          "path": ".github/workflows/bump-go.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__bump-go.yml"
+        },
+        {
+          "path": ".github/workflows/codeql.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__codeql.yml"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__copilot-setup-steps.yml"
+        },
+        {
+          "path": ".github/workflows/dependabot-triage.lock.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__dependabot-triage.lock.yml"
+        },
+        {
+          "path": ".github/workflows/deployment.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__deployment.yml"
+        },
+        {
+          "path": ".github/workflows/go.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/cli__cli/.github__workflows__go.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "sigstore/cosign",
+      "commit": "0c66ecdff337f647bbcb0259efe61a81e33a76e8",
+      "branch": "main",
+      "category": "security",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/build.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__build.yaml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/conformance-nightly.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__conformance-nightly.yml"
+        },
+        {
+          "path": ".github/workflows/conformance.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__conformance.yml"
+        },
+        {
+          "path": ".github/workflows/cut-release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__cut-release.yml"
+        },
+        {
+          "path": ".github/workflows/depsreview.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__depsreview.yml"
+        },
+        {
+          "path": ".github/workflows/donotsubmit.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__donotsubmit.yaml"
+        },
+        {
+          "path": ".github/workflows/e2e-tests.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sigstore__cosign/.github__workflows__e2e-tests.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "BurntSushi/ripgrep",
+      "commit": "3fce3b5bb0236da2df6d99672afb8a719642eca7",
+      "branch": "master",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/BurntSushi__ripgrep/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/BurntSushi__ripgrep/.github__workflows__release.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "sharkdp/bat",
+      "commit": "7323a7514f7601737640e7172be115127d6db08c",
+      "branch": "master",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/CICD.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sharkdp__bat/.github__workflows__CICD.yml"
+        },
+        {
+          "path": ".github/workflows/require-changelog-for-PRs.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sharkdp__bat/.github__workflows__require-changelog-for-PRs.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "sharkdp/fd",
+      "commit": "9e8927e8f3ee7bb699df55cb0b440f848dce6857",
+      "branch": "master",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/CICD.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/sharkdp__fd/.github__workflows__CICD.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "clap-rs/clap",
+      "commit": "8542fea5f9bd1de89fcac7eeb5724b565743c6fb",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/audit.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__audit.yml"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/committed.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__committed.yml"
+        },
+        {
+          "path": ".github/workflows/post-release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__post-release.yml"
+        },
+        {
+          "path": ".github/workflows/pre-commit.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__pre-commit.yml"
+        },
+        {
+          "path": ".github/workflows/rust-next.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__rust-next.yml"
+        },
+        {
+          "path": ".github/workflows/spelling.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__spelling.yml"
+        },
+        {
+          "path": ".github/workflows/template.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/clap-rs__clap/.github__workflows__template.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "serde-rs/serde",
+      "commit": "a874a1b1bb1cc16cf5ee3b1b7b527af5705742bb",
+      "branch": "master",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/serde-rs__serde/.github__workflows__ci.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "tokio-rs/tokio",
+      "commit": "cf782c5b917b7ea21b6f97f07104ebf16d35f5f8",
+      "branch": "master",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/audit.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tokio-rs__tokio/.github__workflows__audit.yml"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tokio-rs__tokio/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/labeler.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tokio-rs__tokio/.github__workflows__labeler.yml"
+        },
+        {
+          "path": ".github/workflows/loom.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tokio-rs__tokio/.github__workflows__loom.yml"
+        },
+        {
+          "path": ".github/workflows/pr-audit.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tokio-rs__tokio/.github__workflows__pr-audit.yml"
+        },
+        {
+          "path": ".github/workflows/stress-test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tokio-rs__tokio/.github__workflows__stress-test.yml"
+        },
+        {
+          "path": ".github/workflows/uring-kernel-version-test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/tokio-rs__tokio/.github__workflows__uring-kernel-version-test.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "google/gson",
+      "commit": "854c8255b625cf1e13c701a83ea9ccb4caaa576a",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/build.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/google__gson/.github__workflows__build.yml"
+        },
+        {
+          "path": ".github/workflows/check-android-compatibility.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/google__gson/.github__workflows__check-android-compatibility.yml"
+        },
+        {
+          "path": ".github/workflows/check-api-compatibility.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/google__gson/.github__workflows__check-api-compatibility.yml"
+        },
+        {
+          "path": ".github/workflows/cifuzz.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/google__gson/.github__workflows__cifuzz.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/google__gson/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/scorecard.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/google__gson/.github__workflows__scorecard.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "square/okhttp",
+      "commit": "40a3b8749deaacf60a04c890aed052cb14ad36ee",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/build.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/square__okhttp/.github__workflows__build.yml"
+        },
+        {
+          "path": ".github/workflows/docs.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/square__okhttp/.github__workflows__docs.yml"
+        },
+        {
+          "path": ".github/workflows/publish.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/square__okhttp/.github__workflows__publish.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "junit-team/junit5",
+      "commit": "9ab2f87cf396a68590fb6675b598d63eaf655ac1",
+      "branch": "main",
+      "category": "library",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/_build.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows___build.yml"
+        },
+        {
+          "path": ".github/workflows/_codeql.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows___codeql.yml"
+        },
+        {
+          "path": ".github/workflows/_cross-version.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows___cross-version.yml"
+        },
+        {
+          "path": ".github/workflows/_publish.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows___publish.yml"
+        },
+        {
+          "path": ".github/workflows/_reproducible-build.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows___reproducible-build.yml"
+        },
+        {
+          "path": ".github/workflows/_zizmor-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows___zizmor-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/close-inactive-issues.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/junit-team__junit5/.github__workflows__close-inactive-issues.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "helm/helm",
+      "commit": "7fd3c5e8f2f096573b86a76fa5682ef905778c5a",
+      "branch": "main",
+      "category": "devops",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/build-test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__build-test.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/golangci-lint.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__golangci-lint.yml"
+        },
+        {
+          "path": ".github/workflows/govulncheck.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__govulncheck.yml"
+        },
+        {
+          "path": ".github/workflows/label-pr.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__label-pr.yml"
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__release.yml"
+        },
+        {
+          "path": ".github/workflows/scorecards.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__scorecards.yml"
+        },
+        {
+          "path": ".github/workflows/stale.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/helm__helm/.github__workflows__stale.yaml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "argoproj/argo-cd",
+      "commit": "7fe2ec7cf937dd839fb9ec8618dcc4642f90c2da",
+      "branch": "master",
+      "category": "devops",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/bump-major-version.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__bump-major-version.yaml"
+        },
+        {
+          "path": ".github/workflows/cherry-pick-single.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__cherry-pick-single.yml"
+        },
+        {
+          "path": ".github/workflows/cherry-pick.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__cherry-pick.yml"
+        },
+        {
+          "path": ".github/workflows/ci-build.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__ci-build.yaml"
+        },
+        {
+          "path": ".github/workflows/codeql.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__codeql.yml"
+        },
+        {
+          "path": ".github/workflows/image-reuse.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__image-reuse.yaml"
+        },
+        {
+          "path": ".github/workflows/image.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__image.yaml"
+        },
+        {
+          "path": ".github/workflows/init-release.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/argoproj__argo-cd/.github__workflows__init-release.yaml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "kubernetes-sigs/kustomize",
+      "commit": "078ab6cf8e87a87a4dea4c81a8c3f4519e97dec5",
+      "branch": "master",
+      "category": "devops",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/apidiff.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/kubernetes-sigs__kustomize/.github__workflows__apidiff.yml"
+        },
+        {
+          "path": ".github/workflows/go.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/kubernetes-sigs__kustomize/.github__workflows__go.yml"
+        },
+        {
+          "path": ".github/workflows/release.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/kubernetes-sigs__kustomize/.github__workflows__release.yaml"
+        },
+        {
+          "path": ".github/workflows/test-install-kustomize.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/kubernetes-sigs__kustomize/.github__workflows__test-install-kustomize.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "fluxcd/flux2",
+      "commit": "b51b7ce78883e123441305281a600e276ed06c23",
+      "branch": "main",
+      "category": "devops",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/action.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__action.yaml"
+        },
+        {
+          "path": ".github/workflows/backport.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__backport.yaml"
+        },
+        {
+          "path": ".github/workflows/conformance.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__conformance.yaml"
+        },
+        {
+          "path": ".github/workflows/e2e-azure.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__e2e-azure.yaml"
+        },
+        {
+          "path": ".github/workflows/e2e-bootstrap.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__e2e-bootstrap.yaml"
+        },
+        {
+          "path": ".github/workflows/e2e-gcp.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__e2e-gcp.yaml"
+        },
+        {
+          "path": ".github/workflows/e2e.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__e2e.yaml"
+        },
+        {
+          "path": ".github/workflows/ossf.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/fluxcd__flux2/.github__workflows__ossf.yaml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "aquasecurity/trivy",
+      "commit": "b830ddf931ba1f5c12af06281abb919d101538b7",
+      "branch": "main",
+      "category": "security",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/auto-close-issue.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__auto-close-issue.yaml"
+        },
+        {
+          "path": ".github/workflows/auto-ready-for-review.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__auto-ready-for-review.yaml"
+        },
+        {
+          "path": ".github/workflows/auto-update-labels.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__auto-update-labels.yaml"
+        },
+        {
+          "path": ".github/workflows/backport.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__backport.yaml"
+        },
+        {
+          "path": ".github/workflows/bypass-cla.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__bypass-cla.yaml"
+        },
+        {
+          "path": ".github/workflows/bypass-test.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__bypass-test.yaml"
+        },
+        {
+          "path": ".github/workflows/cache-test-assets.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__cache-test-assets.yaml"
+        },
+        {
+          "path": ".github/workflows/canary.yaml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/aquasecurity__trivy/.github__workflows__canary.yaml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "gitleaks/gitleaks",
+      "commit": "b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b",
+      "branch": "master",
+      "category": "security",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/gitleaks.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gitleaks__gitleaks/.github__workflows__gitleaks.yml"
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gitleaks__gitleaks/.github__workflows__release.yml"
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gitleaks__gitleaks/.github__workflows__test.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "trufflesecurity/trufflehog",
+      "commit": "288a8a8643a2c5a36b81d231c550dccfa0beeb64",
+      "branch": "main",
+      "category": "security",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/detector-corpora-test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__detector-corpora-test.yml"
+        },
+        {
+          "path": ".github/workflows/detector-tests.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__detector-tests.yml"
+        },
+        {
+          "path": ".github/workflows/lint.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__lint.yml"
+        },
+        {
+          "path": ".github/workflows/performance.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__performance.yml"
+        },
+        {
+          "path": ".github/workflows/release-bot.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__release-bot.yml"
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__release.yml"
+        },
+        {
+          "path": ".github/workflows/secrets.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/trufflesecurity__trufflehog/.github__workflows__secrets.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "jqlang/jq",
+      "commit": "df24981307658868759faaea76b817cc62dd6be0",
+      "branch": "master",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/jqlang__jq/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/decnum.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/jqlang__jq/.github__workflows__decnum.yml"
+        },
+        {
+          "path": ".github/workflows/manpage.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/jqlang__jq/.github__workflows__manpage.yml"
+        },
+        {
+          "path": ".github/workflows/oniguruma.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/jqlang__jq/.github__workflows__oniguruma.yml"
+        },
+        {
+          "path": ".github/workflows/scanbuild.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/jqlang__jq/.github__workflows__scanbuild.yml"
+        },
+        {
+          "path": ".github/workflows/valgrind.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/jqlang__jq/.github__workflows__valgrind.yml"
+        },
+        {
+          "path": ".github/workflows/website.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/jqlang__jq/.github__workflows__website.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "stedolan/jq",
+      "commit": "df24981307658868759faaea76b817cc62dd6be0",
+      "branch": "master",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/stedolan__jq/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/decnum.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/stedolan__jq/.github__workflows__decnum.yml"
+        },
+        {
+          "path": ".github/workflows/manpage.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/stedolan__jq/.github__workflows__manpage.yml"
+        },
+        {
+          "path": ".github/workflows/oniguruma.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/stedolan__jq/.github__workflows__oniguruma.yml"
+        },
+        {
+          "path": ".github/workflows/scanbuild.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/stedolan__jq/.github__workflows__scanbuild.yml"
+        },
+        {
+          "path": ".github/workflows/valgrind.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/stedolan__jq/.github__workflows__valgrind.yml"
+        },
+        {
+          "path": ".github/workflows/website.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/stedolan__jq/.github__workflows__website.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "muesli/duf",
+      "commit": "4636deb4a7b707a9f04c602db033f9837e50b3f6",
+      "branch": "master",
+      "category": "cli",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/build.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/muesli__duf/.github__workflows__build.yml"
+        },
+        {
+          "path": ".github/workflows/goreleaser.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/muesli__duf/.github__workflows__goreleaser.yml"
+        },
+        {
+          "path": ".github/workflows/lint-soft.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/muesli__duf/.github__workflows__lint-soft.yml"
+        },
+        {
+          "path": ".github/workflows/lint.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/muesli__duf/.github__workflows__lint.yml"
+        },
+        {
+          "path": ".github/workflows/manpage.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/muesli__duf/.github__workflows__manpage.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "actions/checkout",
+      "commit": "f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a",
+      "branch": "main",
+      "category": "actions",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/check-dist.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__checkout/.github__workflows__check-dist.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__checkout/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/licensed.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__checkout/.github__workflows__licensed.yml"
+        },
+        {
+          "path": ".github/workflows/publish-immutable-actions.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__checkout/.github__workflows__publish-immutable-actions.yml"
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__checkout/.github__workflows__test.yml"
+        },
+        {
+          "path": ".github/workflows/update-main-version.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__checkout/.github__workflows__update-main-version.yml"
+        },
+        {
+          "path": ".github/workflows/update-test-ubuntu-git.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__checkout/.github__workflows__update-test-ubuntu-git.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "actions/setup-node",
+      "commit": "db0fb3a98ed314b69026b6e8c9be26a7e2fe65a8",
+      "branch": "main",
+      "category": "actions",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/basic-validation.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__basic-validation.yml"
+        },
+        {
+          "path": ".github/workflows/check-dist.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__check-dist.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/e2e-cache.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__e2e-cache.yml"
+        },
+        {
+          "path": ".github/workflows/licensed.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__licensed.yml"
+        },
+        {
+          "path": ".github/workflows/proxy.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__proxy.yml"
+        },
+        {
+          "path": ".github/workflows/publish-immutable-actions.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__publish-immutable-actions.yml"
+        },
+        {
+          "path": ".github/workflows/release-new-action-version.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__setup-node/.github__workflows__release-new-action-version.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "actions/upload-artifact",
+      "commit": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+      "branch": "main",
+      "category": "actions",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/check-dist.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__upload-artifact/.github__workflows__check-dist.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__upload-artifact/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/licensed.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__upload-artifact/.github__workflows__licensed.yml"
+        },
+        {
+          "path": ".github/workflows/publish-immutable-actions.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__upload-artifact/.github__workflows__publish-immutable-actions.yml"
+        },
+        {
+          "path": ".github/workflows/release-new-action-version.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__upload-artifact/.github__workflows__release-new-action-version.yml"
+        },
+        {
+          "path": ".github/workflows/test-proxy.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__upload-artifact/.github__workflows__test-proxy.yml"
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/actions__upload-artifact/.github__workflows__test.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "step-security/harden-runner",
+      "commit": "e14015d583714f6e62063499dc959a02595150a1",
+      "branch": "main",
+      "category": "security",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/canary.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__canary.yml"
+        },
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/dependency-review.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__dependency-review.yml"
+        },
+        {
+          "path": ".github/workflows/publish-immutable-actions.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__publish-immutable-actions.yml"
+        },
+        {
+          "path": ".github/workflows/recurring-int-tests.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__recurring-int-tests.yml"
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__release.yml"
+        },
+        {
+          "path": ".github/workflows/runs-on.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__runs-on.yml"
+        },
+        {
+          "path": ".github/workflows/scorecards.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/step-security__harden-runner/.github__workflows__scorecards.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "gatsbyjs/gatsby",
+      "commit": "8999a2ed4dd8b40bab6571f7d23c7d196ebdb83e",
+      "branch": "master",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/schedule-stale.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/gatsbyjs__gatsby/.github__workflows__schedule-stale.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "strapi/strapi",
+      "commit": "d83af0410bf31b034b01757729f2231862ee5e87",
+      "branch": "develop",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/caniuse.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__caniuse.yml"
+        },
+        {
+          "path": ".github/workflows/changeFreeze.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__changeFreeze.yml"
+        },
+        {
+          "path": ".github/workflows/checks.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__checks.yml"
+        },
+        {
+          "path": ".github/workflows/clean-up-pr-caches.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__clean-up-pr-caches.yml"
+        },
+        {
+          "path": ".github/workflows/close_stale_issues.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__close_stale_issues.yml"
+        },
+        {
+          "path": ".github/workflows/commitlint.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__commitlint.yml"
+        },
+        {
+          "path": ".github/workflows/community-label.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__community-label.yml"
+        },
+        {
+          "path": ".github/workflows/community-pr-lifecycle.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/strapi__strapi/.github__workflows__community-pr-lifecycle.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "nestjs/nest",
+      "commit": "14b74ae705904626aa2bbe8ee30ad94f48d16381",
+      "branch": "master",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/codeql-analysis.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/nestjs__nest/.github__workflows__codeql-analysis.yml"
+        },
+        {
+          "path": ".github/workflows/pr-content-guard.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/nestjs__nest/.github__workflows__pr-content-guard.yml"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "repo": "withastro/astro",
+      "commit": "db2eaf17ce84a5f75c5eab30f4ae15af32de1a13",
+      "branch": "main",
+      "category": "web",
+      "workflowFiles": [
+        {
+          "path": ".github/workflows/check-merge.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__check-merge.yml"
+        },
+        {
+          "path": ".github/workflows/check.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__check.yml"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__ci.yml"
+        },
+        {
+          "path": ".github/workflows/cleanup-cache.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__cleanup-cache.yml"
+        },
+        {
+          "path": ".github/workflows/congrats.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__congrats.yml"
+        },
+        {
+          "path": ".github/workflows/continuous_benchmark.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__continuous_benchmark.yml"
+        },
+        {
+          "path": ".github/workflows/diff-dependencies.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__diff-dependencies.yml"
+        },
+        {
+          "path": ".github/workflows/examples-deploy.yml",
+          "local": "/Users/abishekkumargiri/Desktop/ciproof/validation/cache/withastro__astro/.github__workflows__examples-deploy.yml"
+        }
+      ],
+      "notes": ""
+    }
+  ]
+}

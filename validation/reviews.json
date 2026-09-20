@@ -1,0 +1,42 @@
+{
+  "reviewedAt": "2026-09-20",
+  "method": "Every CP003 violation and a sample of CP001/CP003 unknowns were manually inspected against the pinned workflow source. Classifications: TRUE_POSITIVE / FALSE_POSITIVE / UNKNOWN / NOT_ACTIONABLE.",
+  "cp001": {
+    "violated": 0,
+    "unknown": 188,
+    "falsePositives": 0,
+    "classification": "No strong (violated) unreachable claims were made on any real workflow, because 80.6% of workflows are partial (unsupported constructs), which correctly gates the strong claim. All 188 are UNKNOWN = NOT_ACTIONABLE (honest 'cannot determine'), not findings.",
+    "note": "Zero false positives. CP001 currently produces no actionable strong findings on real repositories; this is correct-but-low-signal and is the main usefulness limitation for CP001."
+  },
+  "cp003": {
+    "violated": 10,
+    "unknown": 39,
+    "falsePositives": 0,
+    "violatedReviews": [
+      { "repo": "eslint/eslint", "workflow": "pr-labeler.yml", "job": "labeler", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "job pull-requests: write", "no job-level fork guard"], "notes": "actions/labeler; deliberate PRT+write, does not checkout fork code. Reachability claim is correct." },
+      { "repo": "tiangolo/fastapi", "workflow": "detect-conflicts.yml", "job": "main", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "job pull-requests: write"], "notes": "Carries a zizmor:ignore[dangerous-triggers] comment; CIProof names the specific reachable write job." },
+      { "repo": "tiangolo/fastapi", "workflow": "guard-dependencies.yml", "job": "check-author", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target branches:[master]", "workflow-level issues/pull-requests: write"], "notes": "Workflow-level write inherited by job; base=master matched in counterexample." },
+      { "repo": "spf13/cobra", "workflow": "labeler.yml", "job": "triage", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "job pull-requests: write"], "notes": "actions/labeler pattern." },
+      { "repo": "junegunn/fzf", "workflow": "labeler.yml", "job": "label", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "job pull-requests: write"], "notes": "labeler pattern." },
+      { "repo": "helm/helm", "workflow": "label-pr.yml", "job": "label", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "explicit write"], "notes": "labeler pattern." },
+      { "repo": "fluxcd/flux2", "workflow": "backport.yaml", "job": "backport", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target types:[closed,labeled]", "job contents/pull-requests: write", "reusable-workflow caller"], "notes": "Caller declares write; reusable internals unmodeled (limitation). Fork-reachable via 'closed'." },
+      { "repo": "nestjs/nest", "workflow": "pr-content-guard.yml", "job": "guard", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "job pull-requests: write"], "notes": "Guard reads PR as API data; job-level write reachable by fork." },
+      { "repo": "withastro/astro", "workflow": "check-merge.yml", "job": "check", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "workflow-level pull-requests/checks/statuses: write"], "notes": "Workflow-level write inherited by job (no job-level permissions)." },
+      { "repo": "withastro/astro", "workflow": "diff-dependencies.yml", "job": "diff_dependencies", "verdict": "TRUE_POSITIVE", "usefulness": "MEDIUM", "manualEvidence": ["on: pull_request_target", "job pull-requests: write"], "notes": "Reachable write job." }
+    ],
+    "unknownClassification": "All 39 unknowns are ordinary pull_request + fork + explicit write, correctly reported UNKNOWN (fork-token downgrade depends on unmodeled repo settings). Zero were escalated to VIOLATED.",
+    "note": "10/10 violations are TRUE_POSITIVE; 0 false positives. Usefulness is mostly MEDIUM: these rediscover the known pull_request_target-with-write pattern, but with specific reachable-job + scope framing and a concrete counterexample."
+  },
+  "cp002": {
+    "policy": "Explicit rules only; never inferred from job names.",
+    "rulesEvaluated": [
+      { "repo": "python-poetry/poetry", "rule": "upload-pypi requires build", "result": "not-applicable", "notes": "on: release is unsupported; jobs never modeled -> not a useful test." },
+      { "repo": "cli/cli", "workflow": "deployment.yml", "rule": "linux requires validate-tag-name", "result": "not-violated", "verdict": "correct", "notes": "validate-tag-name always precedes linux; no bypass." },
+      { "repo": "jqlang/jq", "workflow": "ci.yml", "rule": "release requires dist; docker requires linux", "result": "unknown", "verdict": "correct", "notes": "prerequisites use matrix (unsupported) -> UNKNOWN, not a false violation." },
+      { "repo": "SYNTHETIC (Phase 4 canonical)", "rule": "deploy requires test", "result": "violated", "verdict": "correct", "notes": "skip_tests=true -> test SKIPPED, deploy RUN via always(); the intended CP002 counterexample." }
+    ],
+    "falseViolations": 0
+  },
+  "falsePositiveClasses": [],
+  "forkGuardFalsePositiveCheck": "Jobs gated on conditions CIProof cannot model (github.repository, github.actor, github.event.*) evaluate to UNKNOWN, not RUN, so CP003 never flags a fork-guarded job as VIOLATED. This false-positive class is structurally prevented and was not observed."
+}
