@@ -4,3 +4,4 @@ coverage
 .scratch
 test/fixtures/**/*.yml
 test/fixtures/**/*.yaml
+validation
