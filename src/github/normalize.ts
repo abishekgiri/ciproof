@@ -136,6 +136,10 @@ function buildModel(
   const model: WorkflowModel = {
     file,
     triggers: buildTriggers(file, template, onToken, unsupported),
+    permissions: buildPermissions(
+      file,
+      root ? findKey(root, "permissions") : undefined,
+    ),
     jobs: buildJobs(file, template, root),
     unsupported,
   };

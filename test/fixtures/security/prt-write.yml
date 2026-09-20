@@ -1,0 +1,12 @@
+# Purpose: CP003 security fixture. pull_request_target reaching a job with
+# explicit contents: write. CIProof must flag reachability from an external
+# context; it MUST NOT execute the step.
+name: prt-write
+on: pull_request_target
+jobs:
+  publish:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo placeholder

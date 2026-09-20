@@ -23,6 +23,7 @@ function workflow(...jobs: JobModel[]): WorkflowModel {
   return {
     file: "test.yml",
     triggers: [],
+    permissions: UNSPECIFIED_PERMISSIONS,
     jobs: new Map(jobs.map((j) => [j.id, j])),
     unsupported: [],
   };

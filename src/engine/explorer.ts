@@ -34,10 +34,24 @@ export interface ExecutionPlan {
   scenarioCount: number;
 }
 
+/**
+ * The full outcome of one evaluated scenario. Unlike plans (which dedup by job
+ * states only), evaluations retain every trust/event context, so
+ * scenario-sensitive checks (e.g. CP003, which depends on fork/event) are never
+ * blinded by deduplication.
+ */
+export interface ScenarioOutcome {
+  scenario: Scenario;
+  trigger: TriggerMatch;
+  jobs: Record<string, JobExecution>;
+}
+
 export interface ExplorationResult {
   scenariosGenerated: number;
   scenariosEvaluated: number;
   plans: ExecutionPlan[];
+  /** Every evaluated scenario with its outcome (authority for checks). */
+  evaluations: ScenarioOutcome[];
   completeness: Completeness;
   limitations: AnalysisLimitation[];
   truncated: boolean;
@@ -56,10 +70,19 @@ export function exploreWorkflow(
 
   const plansBySignature = new Map<string, ExecutionPlan>();
   const order: string[] = [];
+  const evaluations: ScenarioOutcome[] = [];
 
   for (const scenario of scenarios) {
     const evaluation = evaluateWorkflowScenario(model, scenario);
     const signature = behaviorSignature(evaluation);
+
+    const jobs: Record<string, JobExecution> = {};
+    for (const id of [...evaluation.jobs.keys()].sort((a, b) =>
+      a.localeCompare(b),
+    )) {
+      jobs[id] = evaluation.jobs.get(id)?.state ?? "unknown";
+    }
+    evaluations.push({ scenario, trigger: evaluation.trigger, jobs });
 
     const existing = plansBySignature.get(signature);
     if (existing) {
@@ -68,13 +91,6 @@ export function exploreWorkflow(
         existing.scenarios.push(scenario);
       }
       continue;
-    }
-
-    const jobs: Record<string, JobExecution> = {};
-    for (const id of [...evaluation.jobs.keys()].sort((a, b) =>
-      a.localeCompare(b),
-    )) {
-      jobs[id] = evaluation.jobs.get(id)?.state ?? "unknown";
     }
 
     plansBySignature.set(signature, {
@@ -102,6 +118,7 @@ export function exploreWorkflow(
     scenariosGenerated: generated,
     scenariosEvaluated: scenarios.length,
     plans,
+    evaluations,
     completeness,
     limitations,
     truncated,

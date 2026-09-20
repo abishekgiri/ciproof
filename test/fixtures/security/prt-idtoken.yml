@@ -1,0 +1,12 @@
+# Purpose: pull_request_target reaching a job with id-token: write (OIDC token
+# request). CP003 must flag it and categorize id-token distinctly.
+name: prt-idtoken
+on: pull_request_target
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo placeholder
