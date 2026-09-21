@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "snapshotDate": "2026-09-20",
+  "selectionCriteria": "Public GitHub repositories with GitHub Actions workflows, chosen before observing CIProof results to span libraries, CLIs, web apps, infrastructure/devops, security tooling, and the Actions ecosystem across JavaScript/TypeScript, Python, Go, Rust, and JVM. Each repository is pinned to an immutable full commit SHA. Reused from the Phase 5/7 corpus; no repository was swapped out after seeing results.",
+  "repositories": [
+    {
+      "repo": "sindresorhus/got",
+      "commit": "e4cd0d3f072170e178a709bb0d1051e223f1723c",
+      "category": "library"
+    },
+    {
+      "repo": "expressjs/express",
+      "commit": "9a34acf03cb818ff3f8bc40e44176e277a25cbb9",
+      "category": "library"
+    },
+    {
+      "repo": "chalk/chalk",
+      "commit": "8960ada92ca0f9220c8863495bae78dcc0c323ee",
+      "category": "library"
+    },
+    {
+      "repo": "axios/axios",
+      "commit": "56a5f1acdc41965f464eb59bec6cc828113ba546",
+      "category": "library"
+    },
+    {
+      "repo": "lodash/lodash",
+      "commit": "2b5e6f7399a7b48005140b5d5c6bc6c0e62919a8",
+      "category": "library"
+    },
+    {
+      "repo": "prettier/prettier",
+      "commit": "0292df6bf356a577de0dc72e6114c8a801978552",
+      "category": "cli"
+    },
+    {
+      "repo": "eslint/eslint",
+      "commit": "3c0b7c6e1fe2dec778b97a996018126f22d437ae",
+      "category": "cli"
+    },
+    {
+      "repo": "vitejs/vite",
+      "commit": "e9078f865cdff6bed77cd729214a7e2868f126b5",
+      "category": "web"
+    },
+    {
+      "repo": "date-fns/date-fns",
+      "commit": "18cbd436f1428d0f45f89f710df65f62546c42f0",
+      "category": "library"
+    },
+    {
+      "repo": "colinhacks/zod",
+      "commit": "0cd3af5e9f50ad11bbcd4407a46a21b8848ba574",
+      "category": "library"
+    },
+    {
+      "repo": "psf/requests",
+      "commit": "dae7ef63b4df6eded86637f251fc4e3a06c3b479",
+      "category": "library"
+    },
+    {
+      "repo": "pallets/flask",
+      "commit": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+      "category": "web"
+    },
+    {
+      "repo": "pytest-dev/pytest",
+      "commit": "6a0de9be56365e75ff30d75cee9654739ca95f97",
+      "category": "cli"
+    },
+    {
+      "repo": "tiangolo/fastapi",
+      "commit": "50113da16fec53b66b80d75e80a89296de4fa5a5",
+      "category": "web"
+    },
+    {
+      "repo": "psf/black",
+      "commit": "acd6198877ced2d8126b9b3958bb17f4a65ef0d1",
+      "category": "cli"
+    },
+    {
+      "repo": "encode/httpx",
+      "commit": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+      "category": "library"
+    },
+    {
+      "repo": "python-poetry/poetry",
+      "commit": "f8408cab10a99ad81e4e16a0f2fda9593f5f089f",
+      "category": "cli"
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "commit": "915896d163835a57fd7987180087409a3229bd71",
+      "category": "library"
+    },
+    {
+      "repo": "gin-gonic/gin",
+      "commit": "3b08cd7235bd5ad2f055aa9e38135f111f6c5926",
+      "category": "web"
+    },
+    {
+      "repo": "spf13/cobra",
+      "commit": "adbc8813901bba65827259daa8e22ff94ec1f30e",
+      "category": "library"
+    },
+    {
+      "repo": "junegunn/fzf",
+      "commit": "b1be3a8be1b833ce5b92fbbac11637643d60a046",
+      "category": "cli"
+    },
+    {
+      "repo": "cli/cli",
+      "commit": "0cf1092493af067646fc5f3db9421c6a6ec9c938",
+      "category": "cli"
+    },
+    {
+      "repo": "sigstore/cosign",
+      "commit": "0c66ecdff337f647bbcb0259efe61a81e33a76e8",
+      "category": "security"
+    },
+    {
+      "repo": "BurntSushi/ripgrep",
+      "commit": "3fce3b5bb0236da2df6d99672afb8a719642eca7",
+      "category": "cli"
+    },
+    {
+      "repo": "sharkdp/bat",
+      "commit": "7323a7514f7601737640e7172be115127d6db08c",
+      "category": "cli"
+    },
+    {
+      "repo": "sharkdp/fd",
+      "commit": "9e8927e8f3ee7bb699df55cb0b440f848dce6857",
+      "category": "cli"
+    },
+    {
+      "repo": "clap-rs/clap",
+      "commit": "8542fea5f9bd1de89fcac7eeb5724b565743c6fb",
+      "category": "library"
+    },
+    {
+      "repo": "serde-rs/serde",
+      "commit": "a874a1b1bb1cc16cf5ee3b1b7b527af5705742bb",
+      "category": "library"
+    },
+    {
+      "repo": "tokio-rs/tokio",
+      "commit": "cf782c5b917b7ea21b6f97f07104ebf16d35f5f8",
+      "category": "library"
+    },
+    {
+      "repo": "google/gson",
+      "commit": "854c8255b625cf1e13c701a83ea9ccb4caaa576a",
+      "category": "library"
+    },
+    {
+      "repo": "square/okhttp",
+      "commit": "40a3b8749deaacf60a04c890aed052cb14ad36ee",
+      "category": "library"
+    },
+    {
+      "repo": "junit-team/junit5",
+      "commit": "9ab2f87cf396a68590fb6675b598d63eaf655ac1",
+      "category": "library"
+    },
+    {
+      "repo": "helm/helm",
+      "commit": "7fd3c5e8f2f096573b86a76fa5682ef905778c5a",
+      "category": "devops"
+    },
+    {
+      "repo": "argoproj/argo-cd",
+      "commit": "7fe2ec7cf937dd839fb9ec8618dcc4642f90c2da",
+      "category": "devops"
+    },
+    {
+      "repo": "kubernetes-sigs/kustomize",
+      "commit": "078ab6cf8e87a87a4dea4c81a8c3f4519e97dec5",
+      "category": "devops"
+    },
+    {
+      "repo": "fluxcd/flux2",
+      "commit": "b51b7ce78883e123441305281a600e276ed06c23",
+      "category": "devops"
+    },
+    {
+      "repo": "aquasecurity/trivy",
+      "commit": "b830ddf931ba1f5c12af06281abb919d101538b7",
+      "category": "security"
+    },
+    {
+      "repo": "gitleaks/gitleaks",
+      "commit": "b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b",
+      "category": "security"
+    },
+    {
+      "repo": "trufflesecurity/trufflehog",
+      "commit": "288a8a8643a2c5a36b81d231c550dccfa0beeb64",
+      "category": "security"
+    },
+    {
+      "repo": "jqlang/jq",
+      "commit": "df24981307658868759faaea76b817cc62dd6be0",
+      "category": "cli"
+    },
+    {
+      "repo": "stedolan/jq",
+      "commit": "df24981307658868759faaea76b817cc62dd6be0",
+      "category": "cli"
+    },
+    {
+      "repo": "muesli/duf",
+      "commit": "4636deb4a7b707a9f04c602db033f9837e50b3f6",
+      "category": "cli"
+    },
+    {
+      "repo": "actions/checkout",
+      "commit": "f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a",
+      "category": "actions"
+    },
+    {
+      "repo": "actions/setup-node",
+      "commit": "db0fb3a98ed314b69026b6e8c9be26a7e2fe65a8",
+      "category": "actions"
+    },
+    {
+      "repo": "actions/upload-artifact",
+      "commit": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+      "category": "actions"
+    },
+    {
+      "repo": "step-security/harden-runner",
+      "commit": "e14015d583714f6e62063499dc959a02595150a1",
+      "category": "security"
+    },
+    {
+      "repo": "gatsbyjs/gatsby",
+      "commit": "8999a2ed4dd8b40bab6571f7d23c7d196ebdb83e",
+      "category": "web"
+    },
+    {
+      "repo": "strapi/strapi",
+      "commit": "d83af0410bf31b034b01757729f2231862ee5e87",
+      "category": "web"
+    },
+    {
+      "repo": "nestjs/nest",
+      "commit": "14b74ae705904626aa2bbe8ee30ad94f48d16381",
+      "category": "web"
+    },
+    {
+      "repo": "withastro/astro",
+      "commit": "db2eaf17ce84a5f75c5eab30f4ae15af32de1a13",
+      "category": "web"
+    }
+  ]
+}

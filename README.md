@@ -357,9 +357,34 @@ CIProof **never executes** workflow shell steps, repository scripts, local actio
 
 ## Status
 
-Pre-alpha. The engine is being built spike-first: the first milestone is to accurately reproduce GitHub's real behavior on a semantic-compatibility fixture suite before any product polish. Supported semantics are deliberately narrow and grow only when validated against real GitHub Actions runs.
+Pre-alpha, but validated against real workflows. Supported semantics grow only
+when they agree with GitHub's actual behavior; everything outside the supported
+model surfaces as `UNKNOWN`, never a guess.
 
-**v0.1 target scope:** events `push` / `pull_request` / `pull_request_target` / `workflow_dispatch`; `branches`/`paths` filters; `jobs.<id>.if`, `needs`, `permissions`; boolean & choice dispatch inputs; internal vs. fork trust. Everything outside this surfaces as `UNKNOWN`, never a guess.
+**Supported semantics:** events `push`, `pull_request`, `pull_request_target`,
+`workflow_dispatch`, `schedule`, `workflow_run`; `branches`/`branches-ignore`,
+`tags`/`tags-ignore`, and `paths`/`paths-ignore` filters; `jobs.<id>.if`,
+`needs`, and `permissions`; boolean & choice dispatch inputs; internal vs. fork
+trust; static matrices; local (same-repository) reusable workflows. `concurrency`
+is modeled as informational. External reusable workflows, dynamic matrices,
+runtime `needs.*.outputs.*`, and unsupported triggers surface as `UNKNOWN`.
+
+## Real-world validation
+
+CIProof is measured against a pinned corpus of **50 public repositories / 295
+workflows** (`validation/manifest.json`). On that corpus:
+
+- **45.2%** of analyzed workflows are fully modeled; **54.8%** are partial
+  (semantic `UNKNOWN`); 1 workflow is rejected by GitHub's own parser.
+- **18/18** controlled semantic-compatibility cases match documented GitHub
+  behavior (0 false RUN/SKIP/BLOCK).
+- **10** concrete counterexamples were manually audited: **10 confirmed, 0 false
+  positives**.
+
+These figures are specific to the pinned corpus and audited sample, not general
+accuracy claims. Full methodology, denominators, and the ranked `UNKNOWN`
+taxonomy are in [docs/validation-study.md](docs/validation-study.md); regenerate
+the metrics with `npm run validate:corpus`.
 
 ---
 
