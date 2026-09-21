@@ -108,7 +108,9 @@ export function buildProgram(): Command {
       "--config <path>",
       "path to a ciproof.yml invariant configuration (overrides discovery)",
     )
-    .option("--json", "emit findings as JSON", false)
+    .option("--format <format>", "output format: text | json | sarif", "text")
+    .option("--output <file>", "write the report to a file instead of stdout")
+    .option("--json", "emit legacy detailed per-workflow JSON", false)
     .action(
       async (options: {
         dir: string;
@@ -116,9 +118,19 @@ export function buildProgram(): Command {
         maxScenarios?: number;
         require: PrerequisiteRule[];
         config?: string;
+        format: string;
+        output?: string;
         json: boolean;
       }) => {
-        const { output, exitCode } = await runCheck({
+        const format = options.format.toLowerCase();
+        if (format !== "text" && format !== "json" && format !== "sarif") {
+          process.stderr.write(
+            `error: unknown --format "${options.format}"; expected text, json, or sarif\n`,
+          );
+          process.exitCode = 2;
+          return;
+        }
+        const { output, exitCode, stream } = await runCheck({
           root: options.dir,
           ...(options.workflow !== undefined
             ? { workflow: options.workflow }
@@ -133,9 +145,18 @@ export function buildProgram(): Command {
           ...(options.config !== undefined
             ? { configPath: options.config }
             : {}),
+          format,
+          ...(options.output !== undefined ? { output: options.output } : {}),
           json: options.json,
         });
-        process.stdout.write(output.endsWith("\n") ? output : `${output}\n`);
+        if (output.length > 0) {
+          const text = output.endsWith("\n") ? output : `${output}\n`;
+          if (stream === "stderr") {
+            process.stderr.write(text);
+          } else {
+            process.stdout.write(text);
+          }
+        }
         process.exitCode = exitCode;
       },
     );

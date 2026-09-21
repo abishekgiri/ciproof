@@ -43,6 +43,8 @@ export type UserVerdict = "violated" | "not-violated" | "unknown";
 
 export interface InvariantResult {
   id: string;
+  /** The invariant kind, e.g. `job-not-reachable` (stamped by the evaluator). */
+  rule?: string;
   description?: string;
   verdict: UserVerdict;
   message: string;
@@ -85,6 +87,7 @@ export function evaluateUserInvariants(
         message: outcome.referenceError,
       });
     } else {
+      outcome.result.rule = invariant.kind;
       results.push(outcome.result);
     }
   }
