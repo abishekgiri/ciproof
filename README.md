@@ -125,13 +125,119 @@ npx ciproof check
 
 ```bash
 ciproof check                        # verify invariants, report counterexamples
+ciproof check --format json          # machine-readable report for scripts
+ciproof check --format sarif -o f    # SARIF 2.1.0 for GitHub code scanning
 ciproof paths <workflow>             # enumerate meaningful execution scenarios
 ciproof explain <job> --event ...    # explain why a job runs/skips in one context
 ciproof inspect                      # show the normalized workflow model
 ciproof diff <base>...<head>         # semantic behavior diff between two git revisions
 ```
 
-Exit codes: `0` no violation · `1` violation found · `2` bad config / git error · `3` parse/model error · `4` analysis incomplete.
+Exit codes (identical across `--format text|json|sarif` for the same analysis):
+
+| Code | Meaning                                                    |
+| ---- | ---------------------------------------------------------- |
+| `0`  | no violation, analysis sufficiently modeled                |
+| `1`  | one or more invariants REFUTED (a concrete counterexample) |
+| `2`  | CLI / configuration / reference error, or an I/O failure   |
+| `3`  | parser / model failure                                     |
+| `4`  | UNKNOWN with no concrete violation                         |
+
+`REFUTED` takes priority over `UNKNOWN`: if any invariant is refuted, the exit
+code is `1` even when others are unknown, because a concrete failure exists.
+
+### Machine-readable output
+
+For scripts, request JSON (stdout carries only JSON — diagnostics go to stderr):
+
+```bash
+ciproof check --format json
+```
+
+```json
+{
+  "version": 1,
+  "summary": { "refuted": 1, "unknown": 0, "passed": 2 },
+  "results": [
+    {
+      "id": "forks-cannot-publish",
+      "rule": "job-not-reachable",
+      "ruleId": "ciproof/user/forks-cannot-publish",
+      "verdict": "refuted",
+      "workflow": ".github/workflows/release.yml",
+      "job": "publish",
+      "location": { "file": ".github/workflows/release.yml", "line": 4 },
+      "counterexample": {
+        "scenario": { "event": "pull_request_target", "fork": "true" }
+      },
+      "fingerprint": "…"
+    }
+  ]
+}
+```
+
+The `version` field is a stable contract: fields may be added compatibly, and a
+breaking change increments it. `results` lists actionable findings (REFUTED and
+UNKNOWN); `summary` counts every verdict. UNKNOWN findings always carry
+`unknownReasons` and are never reported as passing. (`--json` still emits the
+older detailed per-workflow shape for backward compatibility.)
+
+### SARIF and GitHub code scanning
+
+```bash
+ciproof check --format sarif --output ciproof.sarif
+```
+
+Produces a SARIF 2.1.0 log compatible with GitHub code scanning. Rule ids are
+stable (`ciproof/builtin/CP001`, `ciproof/user/<invariant-id>`), results carry a
+workflow location and a stable `partialFingerprints` value (no timestamps, commit
+SHAs, or absolute paths, so output is reproducible). REFUTED maps to an `error`
+result and UNKNOWN to a `note` result explicitly marked "UNKNOWN (not a pass)";
+NO VIOLATION FOUND produces no result. Upload it from a workflow:
+
+```yaml
+name: CIProof
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write # required to upload SARIF
+
+jobs:
+  ciproof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+
+      # Capture the exit code so we can upload SARIF, then fail on a real violation.
+      - name: Run CIProof
+        id: ciproof
+        run: |
+          set +e
+          npx ciproof check --format sarif --output ciproof.sarif
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ciproof.sarif
+
+      - name: Fail on violation
+        if: steps.ciproof.outputs.exit != '0'
+        run: exit ${{ steps.ciproof.outputs.exit }}
+```
+
+This uploads results even when CIProof finds a problem, but still fails the job
+on a concrete violation — violations are never silently green.
 
 ### Invariant configuration (`ciproof.yml`)
 

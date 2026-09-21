@@ -1,10 +1,15 @@
 /**
- * `ciproof check` — run the built-in invariant checks (CP001/CP002/CP003) over
- * each workflow's exploration result and report findings with concrete,
- * already-explored counterexamples. Never prints "safe".
+ * `ciproof check` — verify invariants and report findings with concrete,
+ * already-explored counterexamples. Evaluates user-declared invariants from
+ * `ciproof.yml` when present, otherwise the built-in checks (CP001/CP002/CP003).
+ *
+ * Output is available as human text, JSON (`--format json`), or SARIF 2.1.0
+ * (`--format sarif`), all built from the same structured findings — never by
+ * parsing the text output. The exit code depends only on the analysis, not the
+ * format. Never prints "safe".
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import type { WorkflowModel } from "./model/index.js";
 import {
   exploreWorkflow,
@@ -31,6 +36,14 @@ import {
   type ConfigIssue,
 } from "./config/index.js";
 import type { ReferenceError } from "./invariants/index.js";
+import {
+  findingsFromBuiltin,
+  findingsFromInvariants,
+  renderJsonReport,
+  renderSarif,
+  type OutputFormat,
+} from "./report/index.js";
+import pkg from "../package.json" with { type: "json" };
 
 export interface CheckCliOptions {
   root: string;
@@ -39,12 +52,19 @@ export interface CheckCliOptions {
   prerequisiteRules?: PrerequisiteRule[];
   /** Explicit config path (`--config`); overrides discovery. */
   configPath?: string;
+  /** Machine-readable format for the report (text | json | sarif). */
+  format?: OutputFormat;
+  /** Write the report to this file instead of stdout. */
+  output?: string;
+  /** Legacy detailed per-workflow JSON (superseded by `format: "json"`). */
   json?: boolean;
 }
 
 export interface CheckResult {
   output: string;
   exitCode: number;
+  /** Which stream the output belongs on (default stdout). */
+  stream?: "stdout" | "stderr";
 }
 
 interface CheckedWorkflow {
@@ -55,8 +75,11 @@ interface CheckedWorkflow {
 }
 
 export async function runCheck(options: CheckCliOptions): Promise<CheckResult> {
+  const format: OutputFormat = options.format ?? "text";
+
   // Load configuration first: a bad config is a usage error (exit 2) regardless
-  // of the workflows.
+  // of the workflows. Config errors are human diagnostics -> stderr, never mixed
+  // into a machine-readable stdout report.
   const config = loadConfig({
     root: options.root,
     ...(options.configPath !== undefined
@@ -64,7 +87,11 @@ export async function runCheck(options: CheckCliOptions): Promise<CheckResult> {
       : {}),
   });
   if (config.status === "error") {
-    return { output: renderConfigErrors(config), exitCode: 2 };
+    return {
+      output: renderConfigErrors(config),
+      exitCode: 2,
+      stream: "stderr",
+    };
   }
 
   let files = discoverWorkflowFiles(options.root);
@@ -104,28 +131,20 @@ export async function runCheck(options: CheckCliOptions): Promise<CheckResult> {
     checked.push({ file: file.path, model, exploration, findings });
   }
 
-  // Config-driven mode: evaluate user-declared invariants.
-  if (config.status === "ok") {
-    return runInvariantMode(config, checked, options.json ?? false);
-  }
+  const rendered =
+    config.status === "ok"
+      ? renderConfigMode(config, checked, format, options.json ?? false)
+      : renderBuiltinMode(checked, files.length, format, options.json ?? false);
 
-  // Config-free mode: retain the existing built-in check behavior.
-  const anyViolation = checked.some((w) =>
-    w.findings.some((f) => f.verdict === "violated"),
-  );
-  const anyParseFailure = checked.some((w) => w.exploration === undefined);
-  const exitCode = anyParseFailure ? 3 : anyViolation ? 1 : 0;
-
-  const output = options.json
-    ? renderJson(checked)
-    : renderText(checked, files.length);
-  return { output, exitCode };
+  return applyOutput(rendered, options.output);
 }
 
-function runInvariantMode(
+/** Config-driven mode: evaluate user-declared invariants. */
+function renderConfigMode(
   config: Extract<ConfigLoad, { status: "ok" }>,
   checked: CheckedWorkflow[],
-  json: boolean,
+  format: OutputFormat,
+  legacyJson: boolean,
 ): CheckResult {
   const analyzed: AnalyzedWorkflow[] = checked
     .filter(
@@ -140,8 +159,9 @@ function runInvariantMode(
   const evaluation = evaluateUserInvariants(config.config, analyzed);
   if (!evaluation.ok) {
     return {
-      output: renderReferenceErrors(evaluation.referenceErrors, json),
+      output: renderReferenceErrors(evaluation.referenceErrors),
       exitCode: 2,
+      stream: "stderr",
     };
   }
 
@@ -150,10 +170,69 @@ function runInvariantMode(
   const anyUnknown = results.some((r) => r.verdict === "unknown");
   const exitCode = anyRefuted ? 1 : anyUnknown ? 4 : 0;
 
-  const output = json
+  if (format === "json" || format === "sarif") {
+    const models = new Map(analyzed.map((a) => [a.file, a.model]));
+    const findings = findingsFromInvariants(results, models);
+    const output =
+      format === "json"
+        ? renderJsonReport(findings)
+        : renderSarif(findings, { toolVersion: pkg.version });
+    return { output, exitCode };
+  }
+
+  // Legacy `--json` keeps the Phase 9 detailed shape; default is text.
+  const output = legacyJson
     ? renderInvariantJson(config.path, results)
     : renderInvariantText(results);
   return { output, exitCode };
+}
+
+/** Config-free mode: the built-in checks (CP001/CP002/CP003). */
+function renderBuiltinMode(
+  checked: CheckedWorkflow[],
+  discovered: number,
+  format: OutputFormat,
+  legacyJson: boolean,
+): CheckResult {
+  const anyViolation = checked.some((w) =>
+    w.findings.some((f) => f.verdict === "violated"),
+  );
+  const parseFailures = checked
+    .filter((w) => w.exploration === undefined)
+    .map((w) => w.file);
+  const exitCode = parseFailures.length > 0 ? 3 : anyViolation ? 1 : 0;
+
+  if (format === "json" || format === "sarif") {
+    const findings = findingsFromBuiltin(checked);
+    const output =
+      format === "json"
+        ? renderJsonReport(findings, { parseFailures })
+        : renderSarif(findings, { toolVersion: pkg.version, parseFailures });
+    return { output, exitCode };
+  }
+
+  const output = legacyJson
+    ? renderJson(checked)
+    : renderText(checked, discovered);
+  return { output, exitCode };
+}
+
+/** Write to a file when `--output` is set; otherwise return for stdout. */
+function applyOutput(result: CheckResult, output?: string): CheckResult {
+  if (output === undefined || result.stream === "stderr") {
+    return result;
+  }
+  try {
+    writeFileSync(output, result.output);
+    return { output: "", exitCode: result.exitCode };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      output: `error: cannot write report to ${output}: ${message}\n`,
+      exitCode: 2,
+      stream: "stderr",
+    };
+  }
 }
 
 function reportable(findings: Finding[]): Finding[] {
@@ -466,13 +545,7 @@ function renderConfigErrors(
   return lines.join("\n") + "\n";
 }
 
-function renderReferenceErrors(
-  errors: ReferenceError[],
-  json: boolean,
-): string {
-  if (json) {
-    return JSON.stringify({ referenceErrors: errors }, null, 2) + "\n";
-  }
+function renderReferenceErrors(errors: ReferenceError[]): string {
   const lines = ["CIProof", "", "Configuration error:"];
   for (const err of errors) {
     lines.push(`  invariant "${err.invariantId}": ${err.message}`);
