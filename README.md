@@ -121,17 +121,53 @@ Once released:
 npx ciproof check
 ```
 
-## CLI (planned surface)
+## CLI
 
 ```bash
 ciproof check                        # verify invariants, report counterexamples
 ciproof paths <workflow>             # enumerate meaningful execution scenarios
 ciproof explain <job> --event ...    # explain why a job runs/skips in one context
 ciproof inspect                      # show the normalized workflow model
-ciproof diff origin/main...HEAD      # semantic behavior diff (planned)
+ciproof diff <base>...<head>         # semantic behavior diff between two git revisions
 ```
 
-Exit codes: `0` no violation · `1` violation found · `2` bad config · `3` parse/model error · `4` analysis incomplete.
+Exit codes: `0` no violation · `1` violation found · `2` bad config / git error · `3` parse/model error · `4` analysis incomplete.
+
+### `ciproof diff`
+
+Compares CIProof's **modeled behavior** at two git revisions — not the YAML text.
+It reports how CI behavior changed: a job becoming reachable or unreachable, the
+set of triggering scenarios changing, workflow/job additions and removals, and
+transitions across the modeled/`UNKNOWN` boundary.
+
+```bash
+ciproof diff HEAD~1...HEAD
+ciproof diff origin/main...HEAD
+ciproof diff <sha1>...<sha2>
+```
+
+```text
+CIProof semantic diff
+base:  HEAD~1 (c100b43640d3)
+head:  HEAD (af80bc293c8f)
+
+1 behavior change
+
+ADDED REACHABILITY
+  workflow: .github/workflows/release.yml
+  job: publish
+  before: unreachable
+  after: reachable
+  + push → refs/heads/main
+  + push → refs/tags/v*
+```
+
+A workflow can change textually while producing **no** modeled behavior change
+(formatting, key reordering) — CIProof reports `No modeled CI behavior changes.`
+It preserves `unreachable != unknown`: a job that becomes unanalyzable is
+reported as `MODELED -> UNKNOWN`, never as "removed reachability". Git access is
+read-only and never touches the working tree; `--json` emits a stable machine
+format.
 
 ---
 

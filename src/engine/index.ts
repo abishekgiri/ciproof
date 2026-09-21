@@ -40,6 +40,13 @@ export {
 export { generateScenarios, type ScenarioGeneration } from "./scenarios.js";
 export { behaviorSignature } from "./signatures.js";
 export {
+  classifyJobReachability,
+  describeUnknownReason,
+  type Reachability,
+  type UnknownReason,
+  type ReachabilityClassification,
+} from "./reachability.js";
+export {
   DEFAULT_LIMITS,
   DEFAULT_MAX_SCENARIOS,
   type ExplorationLimits,
