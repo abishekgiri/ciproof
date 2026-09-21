@@ -24,7 +24,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "validate:corpus": "tsx validation/study.ts"
   },
   "dependencies": {
     "@actions/expressions": "0.3.61",

@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "method": "Every CP003 violation and a sample of CP001/CP003 unknowns were manually inspected against the pinned workflow source. Classifications: TRUE_POSITIVE / FALSE_POSITIVE / UNKNOWN / NOT_ACTIONABLE.",
+  "summary": {
+    "auditedRefuted": 10,
+    "truePositives": 10,
+    "falsePositives": 0,
+    "unverified": 0
+  },
+  "findings": [
+    {
+      "repo": "eslint/eslint",
+      "commit": "3c0b7c6e1fe2dec778b97a996018126f22d437ae",
+      "workflow": "pr-labeler.yml",
+      "job": "labeler",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "job pull-requests: write",
+        "no job-level fork guard"
+      ],
+      "notes": "actions/labeler; deliberate PRT+write, does not checkout fork code. Reachability claim is correct."
+    },
+    {
+      "repo": "tiangolo/fastapi",
+      "commit": "50113da16fec53b66b80d75e80a89296de4fa5a5",
+      "workflow": "detect-conflicts.yml",
+      "job": "main",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "job pull-requests: write"
+      ],
+      "notes": "Carries a zizmor:ignore[dangerous-triggers] comment; CIProof names the specific reachable write job."
+    },
+    {
+      "repo": "tiangolo/fastapi",
+      "commit": "50113da16fec53b66b80d75e80a89296de4fa5a5",
+      "workflow": "guard-dependencies.yml",
+      "job": "check-author",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target branches:[master]",
+        "workflow-level issues/pull-requests: write"
+      ],
+      "notes": "Workflow-level write inherited by job; base=master matched in counterexample."
+    },
+    {
+      "repo": "spf13/cobra",
+      "commit": "adbc8813901bba65827259daa8e22ff94ec1f30e",
+      "workflow": "labeler.yml",
+      "job": "triage",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "job pull-requests: write"
+      ],
+      "notes": "actions/labeler pattern."
+    },
+    {
+      "repo": "junegunn/fzf",
+      "commit": "b1be3a8be1b833ce5b92fbbac11637643d60a046",
+      "workflow": "labeler.yml",
+      "job": "label",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "job pull-requests: write"
+      ],
+      "notes": "labeler pattern."
+    },
+    {
+      "repo": "helm/helm",
+      "commit": "7fd3c5e8f2f096573b86a76fa5682ef905778c5a",
+      "workflow": "label-pr.yml",
+      "job": "label",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "explicit write"
+      ],
+      "notes": "labeler pattern."
+    },
+    {
+      "repo": "fluxcd/flux2",
+      "commit": "b51b7ce78883e123441305281a600e276ed06c23",
+      "workflow": "backport.yaml",
+      "job": "backport",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target types:[closed,labeled]",
+        "job contents/pull-requests: write",
+        "reusable-workflow caller"
+      ],
+      "notes": "Caller declares write; reusable internals unmodeled (limitation). Fork-reachable via 'closed'."
+    },
+    {
+      "repo": "nestjs/nest",
+      "commit": "14b74ae705904626aa2bbe8ee30ad94f48d16381",
+      "workflow": "pr-content-guard.yml",
+      "job": "guard",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "job pull-requests: write"
+      ],
+      "notes": "Guard reads PR as API data; job-level write reachable by fork."
+    },
+    {
+      "repo": "withastro/astro",
+      "commit": "db2eaf17ce84a5f75c5eab30f4ae15af32de1a13",
+      "workflow": "check-merge.yml",
+      "job": "check",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "workflow-level pull-requests/checks/statuses: write"
+      ],
+      "notes": "Workflow-level write inherited by job (no job-level permissions)."
+    },
+    {
+      "repo": "withastro/astro",
+      "commit": "db2eaf17ce84a5f75c5eab30f4ae15af32de1a13",
+      "workflow": "diff-dependencies.yml",
+      "job": "diff_dependencies",
+      "rule": "CP003",
+      "verdict": "TRUE_POSITIVE",
+      "evidence": [
+        "on: pull_request_target",
+        "job pull-requests: write"
+      ],
+      "notes": "Reachable write job."
+    }
+  ]
+}
