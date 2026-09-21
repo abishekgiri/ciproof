@@ -37,3 +37,32 @@ export function highlightForPrivilege(scenario: Scenario): ScenarioHighlight[] {
   }
   return out;
 }
+
+/**
+ * Relevant fields for a reachability counterexample (user invariants). Shows the
+ * trigger context that made the job reachable: event, ref/trust, and inputs.
+ */
+export function highlightForReachability(
+  scenario: Scenario,
+): ScenarioHighlight[] {
+  const out: ScenarioHighlight[] = [{ label: "event", value: scenario.event }];
+  if (scenario.ref) {
+    out.push({ label: "ref", value: scenario.ref });
+  }
+  if (scenario.branch && !scenario.ref) {
+    out.push({ label: "branch", value: scenario.branch });
+  }
+  if (scenario.baseRef) {
+    out.push({ label: "base", value: scenario.baseRef });
+  }
+  if (
+    scenario.event === "pull_request" ||
+    scenario.event === "pull_request_target"
+  ) {
+    out.push({ label: "fork", value: String(scenario.fork) });
+  }
+  for (const [key, value] of Object.entries(scenario.inputs)) {
+    out.push({ label: `input.${key}`, value: String(value) });
+  }
+  return out;
+}

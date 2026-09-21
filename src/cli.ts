@@ -85,7 +85,8 @@ export function buildProgram(): Command {
   program
     .command("check")
     .description(
-      "check built-in invariants (CP001/CP002/CP003) and report findings",
+      "check invariants and report findings; evaluates ciproof.yml invariants " +
+        "when present, otherwise the built-in checks (CP001/CP002/CP003)",
     )
     .option("-C, --dir <path>", "repository root to inspect", process.cwd())
     .option(
@@ -103,6 +104,10 @@ export function buildProgram(): Command {
       collectRequire,
       [] as PrerequisiteRule[],
     )
+    .option(
+      "--config <path>",
+      "path to a ciproof.yml invariant configuration (overrides discovery)",
+    )
     .option("--json", "emit findings as JSON", false)
     .action(
       async (options: {
@@ -110,6 +115,7 @@ export function buildProgram(): Command {
         workflow?: string;
         maxScenarios?: number;
         require: PrerequisiteRule[];
+        config?: string;
         json: boolean;
       }) => {
         const { output, exitCode } = await runCheck({
@@ -123,6 +129,9 @@ export function buildProgram(): Command {
             : {}),
           ...(options.require.length > 0
             ? { prerequisiteRules: options.require }
+            : {}),
+          ...(options.config !== undefined
+            ? { configPath: options.config }
             : {}),
           json: options.json,
         });
