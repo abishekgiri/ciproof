@@ -133,6 +133,72 @@ ciproof diff <base>...<head>         # semantic behavior diff between two git re
 
 Exit codes: `0` no violation · `1` violation found · `2` bad config / git error · `3` parse/model error · `4` analysis incomplete.
 
+### Invariant configuration (`ciproof.yml`)
+
+Declare the guarantees your CI must hold in a `ciproof.yml` at the repository
+root. When it is present, `ciproof check` verifies your invariants against every
+modeled execution scenario and reports a concrete counterexample when one can be
+violated. (With no config file, `ciproof check` runs the built-in checks as
+before.)
+
+```yaml
+version: 1
+
+invariants:
+  # Whenever deploy-production runs, integration-tests must have run.
+  - id: production-needs-tests
+    description: Production deployment requires integration tests.
+    require:
+      when-job-runs: deploy-production
+      job-must-have-run: integration-tests
+
+  # No fork/untrusted scenario may reach publish.
+  - id: forks-cannot-publish
+    require:
+      job-not-reachable:
+        job: publish
+        trust: fork
+
+  # publish must never be reachable from a manual dispatch.
+  - id: no-manual-publish
+    require:
+      job-not-reachable:
+        job: publish
+        event: workflow_dispatch
+
+  # Every run of release must be a tag push (a branch push refutes this).
+  - id: release-only-from-tags
+    require:
+      job-only-reachable:
+        job: release
+        event: push
+        ref: tag
+```
+
+`version: 1` is required (any other value is rejected). Every invariant needs a
+unique `id`. Job ids are not globally unique across workflows, so when an id is
+ambiguous, qualify it:
+
+```yaml
+job:
+  workflow: .github/workflows/deploy.yml
+  id: deploy-production
+```
+
+Configuration is declarative data only — it is never executed. Unknown keys
+(typos), unknown events/trust values, duplicate ids, and references to jobs that
+do not exist are all reported as errors rather than silently ignored.
+
+Verdicts follow CIProof's honest model:
+
+- **REFUTED** (`✗`) — a concrete, already-explored counterexample exists.
+- **NO VIOLATION FOUND** (`✓`) — no violation across the modeled scenarios (not a universal mathematical proof).
+- **UNKNOWN** (`?`) — deciding the invariant depends on semantics/runtime values CIProof cannot model. UNKNOWN never counts as passing.
+
+Exit code in config mode: `1` if any invariant is refuted (a concrete violation
+takes priority), else `4` if any is unknown, else `0`. A `--config <path>` flag
+overrides discovery.
+
 ### `ciproof diff`
 
 Compares CIProof's **modeled behavior** at two git revisions — not the YAML text.

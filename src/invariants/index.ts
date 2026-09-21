@@ -26,5 +26,14 @@ export {
 export {
   highlightForPrerequisite,
   highlightForPrivilege,
+  highlightForReachability,
   type ScenarioHighlight,
 } from "./counterexample.js";
+export {
+  evaluateUserInvariants,
+  type AnalyzedWorkflow,
+  type InvariantResult,
+  type UserEvaluation,
+  type UserVerdict,
+  type ReferenceError,
+} from "./user.js";

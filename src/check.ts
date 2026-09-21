@@ -16,17 +16,29 @@ import {
   runChecks,
   highlightForPrerequisite,
   highlightForPrivilege,
+  highlightForReachability,
+  evaluateUserInvariants,
   type Finding,
   type PrerequisiteRule,
+  type AnalyzedWorkflow,
+  type InvariantResult,
 } from "./invariants/index.js";
 import { normalizeWorkflow } from "./github/normalize.js";
 import { discoverWorkflowFiles, createFileProvider } from "./discovery.js";
+import {
+  loadConfig,
+  type ConfigLoad,
+  type ConfigIssue,
+} from "./config/index.js";
+import type { ReferenceError } from "./invariants/index.js";
 
 export interface CheckCliOptions {
   root: string;
   workflow?: string;
   maxScenarios?: number;
   prerequisiteRules?: PrerequisiteRule[];
+  /** Explicit config path (`--config`); overrides discovery. */
+  configPath?: string;
   json?: boolean;
 }
 
@@ -43,6 +55,18 @@ interface CheckedWorkflow {
 }
 
 export async function runCheck(options: CheckCliOptions): Promise<CheckResult> {
+  // Load configuration first: a bad config is a usage error (exit 2) regardless
+  // of the workflows.
+  const config = loadConfig({
+    root: options.root,
+    ...(options.configPath !== undefined
+      ? { configPath: options.configPath }
+      : {}),
+  });
+  if (config.status === "error") {
+    return { output: renderConfigErrors(config), exitCode: 2 };
+  }
+
   let files = discoverWorkflowFiles(options.root);
   if (options.workflow) {
     files = files.filter((f) => f.path.includes(options.workflow as string));
@@ -80,6 +104,12 @@ export async function runCheck(options: CheckCliOptions): Promise<CheckResult> {
     checked.push({ file: file.path, model, exploration, findings });
   }
 
+  // Config-driven mode: evaluate user-declared invariants.
+  if (config.status === "ok") {
+    return runInvariantMode(config, checked, options.json ?? false);
+  }
+
+  // Config-free mode: retain the existing built-in check behavior.
   const anyViolation = checked.some((w) =>
     w.findings.some((f) => f.verdict === "violated"),
   );
@@ -89,6 +119,40 @@ export async function runCheck(options: CheckCliOptions): Promise<CheckResult> {
   const output = options.json
     ? renderJson(checked)
     : renderText(checked, files.length);
+  return { output, exitCode };
+}
+
+function runInvariantMode(
+  config: Extract<ConfigLoad, { status: "ok" }>,
+  checked: CheckedWorkflow[],
+  json: boolean,
+): CheckResult {
+  const analyzed: AnalyzedWorkflow[] = checked
+    .filter(
+      (
+        c,
+      ): c is CheckedWorkflow &
+        Required<Pick<CheckedWorkflow, "model" | "exploration">> =>
+        c.model !== undefined && c.exploration !== undefined,
+    )
+    .map((c) => ({ file: c.file, model: c.model, exploration: c.exploration }));
+
+  const evaluation = evaluateUserInvariants(config.config, analyzed);
+  if (!evaluation.ok) {
+    return {
+      output: renderReferenceErrors(evaluation.referenceErrors, json),
+      exitCode: 2,
+    };
+  }
+
+  const results = evaluation.results;
+  const anyRefuted = results.some((r) => r.verdict === "violated");
+  const anyUnknown = results.some((r) => r.verdict === "unknown");
+  const exitCode = anyRefuted ? 1 : anyUnknown ? 4 : 0;
+
+  const output = json
+    ? renderInvariantJson(config.path, results)
+    : renderInvariantText(results);
   return { output, exitCode };
 }
 
@@ -276,4 +340,142 @@ function renderJson(checked: CheckedWorkflow[]): string {
     null,
     2,
   );
+}
+
+// ---------------------------------------------------------------------------
+// Config-driven invariant rendering
+// ---------------------------------------------------------------------------
+
+/** Verdict symbol: refuted ✗, passed ✓, unknown ?. */
+function invariantSymbol(verdict: InvariantResult["verdict"]): string {
+  switch (verdict) {
+    case "violated":
+      return "✗";
+    case "not-violated":
+      return "✓";
+    case "unknown":
+      return "?";
+  }
+}
+
+function renderInvariantText(results: InvariantResult[]): string {
+  const lines: string[] = ["CIProof", ""];
+
+  if (results.length === 0) {
+    lines.push("No invariants declared.");
+    return lines.join("\n") + "\n";
+  }
+
+  for (const result of results) {
+    lines.push(`${invariantSymbol(result.verdict)} ${result.id}`);
+  }
+  lines.push("");
+
+  const refuted = results.filter((r) => r.verdict === "violated").length;
+  const passed = results.filter((r) => r.verdict === "not-violated").length;
+  const unknown = results.filter((r) => r.verdict === "unknown").length;
+  lines.push(`${refuted} refuted`);
+  lines.push(`${passed} passed within modeled scenarios`);
+  lines.push(`${unknown} unknown`);
+  lines.push("");
+
+  for (const result of results) {
+    if (result.verdict === "not-violated") {
+      continue;
+    }
+    lines.push(
+      `${invariantSymbol(result.verdict)} ${result.id}  ${result.verdict === "violated" ? "REFUTED" : "UNKNOWN"}`,
+    );
+    if (result.description) {
+      lines.push(`  ${result.description}`);
+    }
+    lines.push(`  ${result.message}`);
+    if (result.workflow) {
+      lines.push(`  workflow: ${result.workflow}`);
+    }
+    if (result.scenario) {
+      lines.push("");
+      lines.push("  Counterexample:");
+      for (const h of highlightForReachability(result.scenario)) {
+        lines.push(`    ${h.label}: ${h.value}`);
+      }
+      if (result.execution) {
+        lines.push("  Execution:");
+        const width = Object.keys(result.execution).reduce(
+          (m, id) => Math.max(m, id.length),
+          0,
+        );
+        for (const [id, state] of Object.entries(result.execution)) {
+          lines.push(`    ${id.padEnd(width)}  ${state.toUpperCase()}`);
+        }
+      }
+    }
+    for (const reason of result.unknownReasons ?? []) {
+      lines.push(`  reason: ${reason}`);
+    }
+    lines.push("");
+  }
+
+  return (
+    lines
+      .join("\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trimEnd() + "\n"
+  );
+}
+
+function renderInvariantJson(
+  configPath: string,
+  results: InvariantResult[],
+): string {
+  return (
+    JSON.stringify(
+      {
+        config: configPath,
+        summary: {
+          refuted: results.filter((r) => r.verdict === "violated").length,
+          passed: results.filter((r) => r.verdict === "not-violated").length,
+          unknown: results.filter((r) => r.verdict === "unknown").length,
+        },
+        invariants: results.map((r) => ({
+          id: r.id,
+          verdict: r.verdict,
+          message: r.message,
+          workflow: r.workflow ?? null,
+          jobId: r.jobId ?? null,
+          counterexample: r.scenario
+            ? { scenario: r.scenario, execution: r.execution ?? null }
+            : null,
+          unknownReasons: r.unknownReasons ?? [],
+        })),
+      },
+      null,
+      2,
+    ) + "\n"
+  );
+}
+
+function renderConfigErrors(
+  config: Extract<ConfigLoad, { status: "error" }>,
+): string {
+  const label = config.path ?? "ciproof.yml";
+  const lines = ["CIProof", "", "Configuration error:"];
+  for (const issue of config.issues as ConfigIssue[]) {
+    lines.push(`  ${label}: ${issue.path}: ${issue.message}`);
+  }
+  return lines.join("\n") + "\n";
+}
+
+function renderReferenceErrors(
+  errors: ReferenceError[],
+  json: boolean,
+): string {
+  if (json) {
+    return JSON.stringify({ referenceErrors: errors }, null, 2) + "\n";
+  }
+  const lines = ["CIProof", "", "Configuration error:"];
+  for (const err of errors) {
+    lines.push(`  invariant "${err.invariantId}": ${err.message}`);
+  }
+  return lines.join("\n") + "\n";
 }
