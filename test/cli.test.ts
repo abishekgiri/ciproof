@@ -15,13 +15,12 @@ describe("cli scaffold", () => {
     expect(buildProgram().version()).toBeDefined();
   });
 
-  it("registers inspect, explain, paths, and check", () => {
-    // Phase 4 boundary: check exists (CP001/CP002/CP003); diff does not.
+  it("registers inspect, explain, paths, check, and diff", () => {
     const names = buildProgram().commands.map((c) => c.name());
     expect(names).toContain("inspect");
     expect(names).toContain("explain");
     expect(names).toContain("paths");
     expect(names).toContain("check");
-    expect(names).not.toContain("diff");
+    expect(names).toContain("diff");
   });
 });

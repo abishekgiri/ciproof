@@ -7,7 +7,7 @@
  * `unknown` (CIProof prefers a missing finding over a false unreachable claim).
  */
 
-import { evidence } from "../../engine/index.js";
+import { classifyJobReachability, evidence } from "../../engine/index.js";
 import type { CheckContext, Finding } from "../types.js";
 
 export const CP001_ID = "CP001";
@@ -24,29 +24,21 @@ export function checkUnreachableJob(context: CheckContext): Finding[] {
   }
 
   for (const [jobId, job] of model.jobs) {
-    const ranSomewhere = exploration.evaluations.some(
-      (e) => e.jobs[jobId] === "run",
+    const { reachability, reason } = classifyJobReachability(
+      jobId,
+      job,
+      exploration,
     );
-    if (ranSomewhere) {
+    if (reachability === "reachable") {
       continue; // reachable — no finding
     }
-
-    const observedUnknown = exploration.evaluations.some(
-      (e) => e.jobs[jobId] === "unknown",
-    );
-    const dependsOnUnsupported = job.unsupported.length > 0;
-    const strongClaimPossible =
-      exploration.completeness === "complete-within-supported-model" &&
-      !exploration.truncated &&
-      !observedUnknown &&
-      !dependsOnUnsupported;
 
     const baseEvidence = [
       evidence("info", `scenarios explored: ${exploration.scenariosEvaluated}`),
       evidence("info", `observed RUN states for "${jobId}": 0`),
     ];
 
-    if (strongClaimPossible) {
+    if (reachability === "unreachable") {
       findings.push({
         id: CP001_ID,
         title: "unreachable job",
@@ -67,11 +59,11 @@ export function checkUnreachableJob(context: CheckContext): Finding[] {
         jobId,
         evidence: [
           ...baseEvidence,
-          observedUnknown
+          reason === "observed-unknown"
             ? evidence("unknown", `"${jobId}" is UNKNOWN in at least one plan`)
             : evidence(
                 "unknown",
-                dependsOnUnsupported
+                reason === "unsupported-construct"
                   ? `"${jobId}" involves constructs outside the supported model`
                   : "exploration is partial",
               ),

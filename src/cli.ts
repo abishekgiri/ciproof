@@ -12,6 +12,7 @@ import { runInspect } from "./inspect.js";
 import { runExplain } from "./explain.js";
 import { runPaths } from "./paths.js";
 import { runCheck } from "./check.js";
+import { runDiff } from "./diff.js";
 import type { SupportedTriggerEvent } from "./model/index.js";
 import type { PrerequisiteRule } from "./invariants/index.js";
 
@@ -122,6 +123,38 @@ export function buildProgram(): Command {
             : {}),
           ...(options.require.length > 0
             ? { prerequisiteRules: options.require }
+            : {}),
+          json: options.json,
+        });
+        process.stdout.write(output.endsWith("\n") ? output : `${output}\n`);
+        process.exitCode = exitCode;
+      },
+    );
+
+  program
+    .command("diff")
+    .description(
+      "compare modeled CI behavior between two git revisions (not a text diff)",
+    )
+    .argument("<revisions>", "revision range, e.g. origin/main...HEAD")
+    .option("-C, --dir <path>", "repository root", process.cwd())
+    .option(
+      "--max-scenarios <n>",
+      "maximum scenarios to evaluate per workflow before truncating",
+      (value) => Number.parseInt(value, 10),
+    )
+    .option("--json", "emit the semantic diff as JSON", false)
+    .action(
+      async (
+        revisions: string,
+        options: { dir: string; maxScenarios?: number; json: boolean },
+      ) => {
+        const { output, exitCode } = await runDiff({
+          root: options.dir,
+          revisions,
+          ...(options.maxScenarios !== undefined &&
+          !Number.isNaN(options.maxScenarios)
+            ? { maxScenarios: options.maxScenarios }
             : {}),
           json: options.json,
         });
