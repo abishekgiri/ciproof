@@ -1,10 +1,29 @@
 {
   "name": "ciproof",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Behavioral verification for GitHub Actions. Write what your CI must guarantee, get a concrete counterexample when it doesn't.",
   "license": "MIT",
   "author": "Abishek Giri",
   "type": "module",
+  "keywords": [
+    "github-actions",
+    "ci",
+    "workflow",
+    "static-analysis",
+    "reachability",
+    "verification",
+    "invariants",
+    "sarif",
+    "security"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abishekgiri/ciproof.git"
+  },
+  "homepage": "https://github.com/abishekgiri/ciproof#readme",
+  "bugs": {
+    "url": "https://github.com/abishekgiri/ciproof/issues"
+  },
   "engines": {
     "node": ">=20"
   },
@@ -12,7 +31,7 @@
     "ciproof": "./dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist/cli.js"
   ],
   "scripts": {
     "build": "tsup",
@@ -25,7 +44,11 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "validate:corpus": "tsx validation/study.ts"
+    "validate:corpus": "tsx validation/study.ts",
+    "os:smoke": "node scripts/os-smoke.mjs",
+    "release:smoke": "node scripts/release-smoke.mjs",
+    "release:check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build && npm run release:smoke",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@actions/expressions": "0.3.61",

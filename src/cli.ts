@@ -6,6 +6,8 @@
  * execution plans). Invariant checking / counterexamples are a later phase.
  */
 
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import pkg from "../package.json" with { type: "json" };
 import { runInspect } from "./inspect.js";
@@ -315,11 +317,25 @@ export async function run(argv: readonly string[]): Promise<void> {
   await buildProgram().parseAsync(argv as string[]);
 }
 
-// Only auto-run when invoked as a script, not when imported by tests.
-const invokedDirectly =
-  process.argv[1] !== undefined &&
-  import.meta.url === `file://${process.argv[1]}`;
+/**
+ * Whether this module is the process entry point (the installed `ciproof` bin),
+ * as opposed to being imported by tests. Compares real paths so it is robust to
+ * symlinked install locations (e.g. macOS temp dirs), paths containing spaces,
+ * and Windows path/URL differences — a naive `file://` + argv[1] string compare
+ * silently fails in those cases and the CLI would do nothing.
+ */
+function invokedDirectly(): boolean {
+  const entry = process.argv[1];
+  if (entry === undefined) {
+    return false;
+  }
+  try {
+    return realpathSync(entry) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
 
-if (invokedDirectly) {
+if (invokedDirectly()) {
   await run(process.argv);
 }

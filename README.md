@@ -113,13 +113,59 @@ CIProof reports one of three honest verdicts, never a confidence percentage:
 
 ## Install
 
-> Not yet published. CIProof is in early development — see [Status](#status).
-
-Once released:
+Run without installing:
 
 ```bash
 npx ciproof check
 ```
+
+Or add it to a project:
+
+```bash
+npm install --save-dev ciproof
+```
+
+CIProof ships as a CLI (Node.js >= 20). `ciproof diff` requires `git` on `PATH`;
+the other commands do not.
+
+## Quickstart
+
+1. **Run the built-in checks** from your repository root:
+
+   ```bash
+   npx ciproof check
+   ```
+
+2. **Declare an invariant** (optional) in `ciproof.yml` at the repo root:
+
+   ```yaml
+   version: 1
+   invariants:
+     - id: deploy-needs-tests
+       require:
+         when-job-runs: deploy
+         job-must-have-run: tests
+   ```
+
+3. **Run it** and read the verdict:
+
+   ```bash
+   npx ciproof check
+   ```
+
+   - `✗ REFUTED` — a concrete counterexample exists (it is printed).
+   - `✓ NO VIOLATION FOUND` — no violation across the modeled scenarios (not a universal proof).
+   - `? UNKNOWN` — CIProof cannot decide this soundly; **UNKNOWN is not a pass**.
+
+4. **In CI**, emit SARIF for GitHub code scanning:
+
+   ```bash
+   npx ciproof check --format sarif --output ciproof.sarif
+   ```
+
+A runnable example lives in [`examples/basic/`](examples/basic/): running
+`ciproof check -C examples/basic` reports a concrete counterexample where
+`deploy` can run with `skip_tests=true` while `tests` is skipped.
 
 ## CLI
 
