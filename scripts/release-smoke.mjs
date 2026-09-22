@@ -130,7 +130,6 @@ for (const token of ["--format", "--output", "sarif"]) {
     );
   }
 }
-const cli = (args, opts = {}) => run("node", [installedCli, ...args], opts);
 const cliAllow = (args, opts = {}) =>
   runAllowExit("node", [installedCli, ...args], opts);
 

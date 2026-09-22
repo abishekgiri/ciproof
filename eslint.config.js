@@ -28,5 +28,21 @@ export default tseslint.config(
       "no-console": "off",
     },
   },
+  {
+    // Node scripts (release/OS smoke). Provide Node globals and relax the
+    // return-type rule that targets the typed library core.
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        Buffer: "readonly",
+        URL: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/explicit-function-return-type": "off",
+    },
+  },
   prettier,
 );
