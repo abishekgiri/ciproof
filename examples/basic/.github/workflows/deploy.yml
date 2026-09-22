@@ -1,0 +1,20 @@
+name: deploy
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: Skip the test job
+        type: boolean
+        default: false
+jobs:
+  tests:
+    if: ${{ !inputs.skip_tests }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "running tests"
+  deploy:
+    needs: tests
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "deploying"

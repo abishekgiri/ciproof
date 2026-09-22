@@ -1,0 +1,9 @@
+version: 1
+
+invariants:
+  # Deploy must never run unless the tests job actually ran.
+  - id: deploy-needs-tests
+    description: Production deploy requires tests to have run.
+    require:
+      when-job-runs: deploy
+      job-must-have-run: tests
