@@ -21,11 +21,17 @@ performed as part of it.
 - [x] tag `v0.1.0` does not already exist
 - [x] npm package name `ciproof` available / owned
 
-## Publication (performed later, after this PR merges — NOT in this phase)
+## Publication (v0.1.0 — completed)
 
-- [ ] merge the release-readiness PR
-- [ ] verify `main` CI is green
-- [ ] create an annotated tag `v0.1.0`
-- [ ] `npm publish` the artifact
-- [ ] create a GitHub Release from the exact tag
-- [ ] verify a fresh-user install (`npx ciproof@0.1.0 --help`)
+- [x] merge the release-readiness PR (#13; merge commit `06aeb73`)
+- [x] verify `main` CI is green
+- [x] create an annotated tag `v0.1.0`
+- [x] `npm publish` the artifact (authenticated first publish with 2FA OTP)
+- [x] create a GitHub Release from the exact tag (`CIProof v0.1.0`)
+- [x] verify the public package (`npm view ciproof@0.1.0`, `latest -> 0.1.0`)
+
+## Future releases (v0.1.1+)
+
+Use [Trusted Publishing](trusted-publishing.md): bump the version on `main`, push
+a matching `vX.Y.Z` tag, and let `.github/workflows/publish.yml` publish via OIDC
+(token-free, with provenance). No manual `npm publish` and no `NPM_TOKEN`.

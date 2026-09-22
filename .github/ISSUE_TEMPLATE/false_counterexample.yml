@@ -1,0 +1,62 @@
+name: False counterexample
+description: CIProof reported REFUTED with a counterexample that cannot actually happen on GitHub Actions.
+title: "[false-counterexample]: "
+labels: ["false-counterexample", "correctness"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A false counterexample is a correctness bug in CIProof. Thank you for reporting it.
+        **Remove any secrets, tokens, or private values before sharing workflow or config content.**
+  - type: input
+    id: version
+    attributes:
+      label: CIProof version
+      description: Output of `npx ciproof --version`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Minimal workflow (YAML)
+      description: The smallest workflow that reproduces the false counterexample.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: ciproof.yml (if any)
+      render: yaml
+  - type: input
+    id: command
+    attributes:
+      label: Command run
+      placeholder: "npx ciproof check"
+    validations:
+      required: true
+  - type: textarea
+    id: verdict
+    attributes:
+      label: Full verdict and counterexample output
+      description: The complete CIProof output, including the counterexample.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected GitHub Actions behavior
+      description: What GitHub actually does for the reported scenario, and why the counterexample cannot occur.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links to GitHub Actions docs, an observed run, or a controlled reproduction.
+  - type: input
+    id: repo
+    attributes:
+      label: Public repository link (optional)

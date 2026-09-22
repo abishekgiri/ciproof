@@ -1,0 +1,47 @@
+name: Unexpected UNKNOWN
+description: CIProof returned UNKNOWN where you expected it to decide the result.
+title: "[unknown]: "
+labels: ["unknown", "coverage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        UNKNOWN is not a failure — it means CIProof cannot soundly decide the result within its modeled semantics.
+        These reports help prioritize which semantics matter most. **Remove secrets before sharing content.**
+  - type: input
+    id: version
+    attributes:
+      label: CIProof version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow / config
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: UNKNOWN reason(s) reported
+      description: The `unknownReasons` from CIProof output, if present.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What you expected CIProof to determine.
+    validations:
+      required: true
+  - type: dropdown
+    id: github-known
+    attributes:
+      label: Is the actual GitHub Actions behavior known to you?
+      options:
+        - "Yes — I know what GitHub does"
+        - "No — I am unsure"
+    validations:
+      required: true

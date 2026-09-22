@@ -2,8 +2,9 @@
 
 **Write what your CI must guarantee. Get a concrete counterexample when it doesn't.**
 
+[![npm version](https://img.shields.io/npm/v/ciproof.svg)](https://www.npmjs.com/package/ciproof)
+[![CI](https://github.com/abishekgiri/ciproof/actions/workflows/ci.yml/badge.svg)](https://github.com/abishekgiri/ciproof/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Status: pre-alpha](https://img.shields.io/badge/status-pre--alpha-orange.svg)](#status)
 [![Made for GitHub Actions](https://img.shields.io/badge/GitHub-Actions-2088FF?logo=githubactions&logoColor=white)](https://docs.github.com/actions)
 
 GitHub Actions workflows are programs — events, branches, permissions, conditions, dependencies, inputs, and trust boundaries. But we still review them like YAML.
@@ -127,6 +128,24 @@ npm install --save-dev ciproof
 
 CIProof ships as a CLI (Node.js >= 20). `ciproof diff` requires `git` on `PATH`;
 the other commands do not.
+
+## Try CIProof on your repository
+
+CIProof v0.1.0 is published on npm. From a repository with `.github/workflows/`:
+
+```bash
+npx ciproof@0.1.0 check
+```
+
+That's it — no install, no config, no secrets, no telemetry. A ~10-minute
+walkthrough (invariants, `paths`, `diff`, and how to read REFUTED / NO VIOLATION
+FOUND / UNKNOWN) is in **[docs/beta-testing.md](docs/beta-testing.md)**.
+
+Feedback is welcome and voluntary via GitHub issues — especially a **false
+counterexample** or an **unexpected UNKNOWN**, which use dedicated
+[issue forms](.github/ISSUE_TEMPLATE/). See what CIProof models today in
+[docs/supported-semantics.md](docs/supported-semantics.md) and its real-world
+accuracy in [docs/validation-study.md](docs/validation-study.md).
 
 ## Quickstart
 
