@@ -1,0 +1,62 @@
+name: Publish
+
+# Publishes to npm via GitHub Actions using npm Trusted Publishing (OIDC) — no
+# long-lived npm token. Triggered only by a version tag push, and only after the
+# full verification gate passes and the tag matches package.json.
+on:
+  push:
+    tags:
+      - "v*"
+
+# Trusted Publishing needs an OIDC token; nothing else is required.
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      # Trusted Publishing requires a recent npm; runtime support (Node >=20) is
+      # a separate, unchanged contract for consumers of the package.
+      - name: Use a Trusted-Publishing-capable npm
+        run: |
+          npm install -g npm@latest
+          node --version
+          npm --version
+
+      - run: npm ci
+
+      # The tag must match the version being published.
+      - name: Verify tag matches package.json
+        run: node scripts/check-release-version.mjs "${GITHUB_REF_NAME}"
+
+      # Full verification gate — do not publish if anything fails.
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm test
+      - run: npm run build
+      - run: npm run release:check
+
+      # Never overwrite an already-published version.
+      - name: Ensure version is not already published
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "ciproof@${VERSION}" version >/dev/null 2>&1; then
+            echo "ciproof@${VERSION} is already published; refusing to republish."
+            exit 1
+          fi
+
+      # Token-free publish. OIDC provides short-lived credentials and npm attaches
+      # provenance automatically for eligible public packages.
+      - name: Publish to npm (Trusted Publishing)
+        run: npm publish
