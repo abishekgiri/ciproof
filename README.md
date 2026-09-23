@@ -137,15 +137,25 @@ CIProof v0.1.0 is published on npm. From a repository with `.github/workflows/`:
 npx ciproof@0.1.0 check
 ```
 
+Or run it in CI with the GitHub Action
+([Marketplace](https://github.com/marketplace/actions/ciproof)):
+
+```yaml
+- uses: actions/checkout@v6
+- uses: abishekgiri/ciproof-action@v1
+```
+
 That's it — no install, no config, no secrets, no telemetry. A ~10-minute
 walkthrough (invariants, `paths`, `diff`, and how to read REFUTED / NO VIOLATION
 FOUND / UNKNOWN) is in **[docs/beta-testing.md](docs/beta-testing.md)**.
 
-Feedback is welcome and voluntary via GitHub issues — especially a **false
-counterexample** or an **unexpected UNKNOWN**, which use dedicated
-[issue forms](.github/ISSUE_TEMPLATE/). See what CIProof models today in
-[docs/supported-semantics.md](docs/supported-semantics.md) and its real-world
-accuracy in [docs/validation-study.md](docs/validation-study.md).
+**CIProof is in beta and looking for testers.** If you run it on a real
+repository, please share what you find — especially a **false counterexample**
+or an **unexpected UNKNOWN** — in the
+[beta discussion](https://github.com/abishekgiri/ciproof/discussions/18) or via
+the dedicated [issue forms](.github/ISSUE_TEMPLATE/). See what CIProof models
+today in [docs/supported-semantics.md](docs/supported-semantics.md) and its
+real-world accuracy in [docs/validation-study.md](docs/validation-study.md).
 
 ## Quickstart
 
