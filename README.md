@@ -186,6 +186,42 @@ A runnable example lives in [`examples/basic/`](examples/basic/): running
 `ciproof check -C examples/basic` reports a concrete counterexample where
 `deploy` can run with `skip_tests=true` while `tests` is skipped.
 
+## GitHub Action
+
+Run CIProof directly in your workflows with the
+[CIProof Action](https://github.com/abishekgiri/ciproof-action). It wraps this
+CLI (the single source of truth), writes a job summary, emits annotations, and
+can optionally comment on pull requests.
+
+```yaml
+name: CIProof
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ciproof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: abishekgiri/ciproof-action@v1
+        with:
+          command: check
+```
+
+A refuted invariant fails the job by default; UNKNOWN is shown but is not a pass.
+The action version (`ciproof-action@v1`) and the analyzer version
+(`ciproof-version`, default `0.1.0`) are independent. See the
+[action repository](https://github.com/abishekgiri/ciproof-action) for inputs,
+outputs, permissions, and fork behavior.
+
 ## CLI
 
 ```bash
